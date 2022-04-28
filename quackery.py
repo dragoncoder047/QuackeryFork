@@ -33,7 +33,7 @@ def ishex(string):
 class QuackeryError(Exception):
     pass
 
-class QuackeryState:
+class QuackeryContext:
     def __init__(self, qstack = None, operators = None, builders = None):
         self.qstack = [] if qstack is None else qstack
         self.rstack = []
@@ -45,7 +45,7 @@ class QuackeryState:
         self.current_build = []
 
     def copy(self):
-        new = QuackeryState(self.qstack.copy(), self.operators.copy(), self.builders.copy())
+        new = QuackeryContext(self.qstack.copy(), self.operators.copy(), self.builders.copy())
         new.rstack = self.rstack.copy()
         new.program_counter = self.program_counter
         new.current_nest = self.current_nest.copy()
@@ -229,315 +229,315 @@ class QuackeryState:
 
 
 
-def python(self):
+def python(ctx):
     """For backwards compatibility only"""
     scope = {
-        "to_stack": self.to_stack,
-        "from_stack": self.from_stack,
-        "string_to_stack": self.string_to_stack,
-        "string_from_stack": self.string_from_stack,
-        "self": self,
+        "to_stack": ctx.to_stack,
+        "from_stack": ctx.from_stack,
+        "string_to_stack": ctx.string_to_stack,
+        "string_from_stack": ctx.string_from_stack,
+        "ctx": ctx,
     }
     try:
-        exec(self.string_from_stack(), scope, globals())
+        exec(ctx.string_from_stack(), scope, globals())
     except QuackeryError:
         raise
     except Exception as diagnostics:
-        self.failed('Python reported: "' + str(diagnostics) + '"')
+        ctx.failed('Python reported: "' + str(diagnostics) + '"')
 
-def qfail(self):
-    self.failed(self.string_from_stack())
+def qfail(ctx):
+    ctx.failed(ctx.string_from_stack())
 
-def stack_size(self):
-    self.to_stack(len(self.qstack))
+def stack_size(ctx):
+    ctx.to_stack(len(ctx.qstack))
 
-def qreturn(self):
-    self.to_stack(self.rstack)
+def qreturn(ctx):
+    ctx.to_stack(ctx.rstack)
 
-def dup(self):
-    a = self.from_stack()
-    self.to_stack(a)
-    self.to_stack(a)
+def dup(ctx):
+    a = ctx.from_stack()
+    ctx.to_stack(a)
+    ctx.to_stack(a)
 
-def drop(self):
-    self.from_stack()
+def drop(ctx):
+    ctx.from_stack()
 
-def swap(self):
-    a = self.from_stack()
-    b = self.from_stack()
-    self.to_stack(a)
-    self.to_stack(b)
+def swap(ctx):
+    a = ctx.from_stack()
+    b = ctx.from_stack()
+    ctx.to_stack(a)
+    ctx.to_stack(b)
 
-def rot(self): # XXX @dragoncoder047 maybe simplify to [ dip swap swap ] is rot ? There are no cyclic references that would prevent this
-    a = self.from_stack()
-    swap(self)
-    self.to_stack(a)
-    swap(self)
+def rot(ctx): # XXX @dragoncoder047 maybe simplify to [ dip swap swap ] is rot ? There are no cyclic references that would prevent this
+    a = ctx.from_stack()
+    swap(ctx)
+    ctx.to_stack(a)
+    swap(ctx)
 
-def over(self): # XXX @dragoncoder047 maybe simplify to [ dip dup swap ] is over ? same reason as above
-    a = self.from_stack()
-    dup(self)
-    self.to_stack(a)
-    swap(self)
+def over(ctx): # XXX @dragoncoder047 maybe simplify to [ dip dup swap ] is over ? same reason as above
+    a = ctx.from_stack()
+    dup(ctx)
+    ctx.to_stack(a)
+    swap(ctx)
 
-def nest_depth(self):
-    self.to_stack(len(self.rstack) // 2)
+def nest_depth(ctx):
+    ctx.to_stack(len(ctx.rstack) // 2)
 
 true = 1
 
 false = 0
 
-def nand(self):
-    self.expect_number()
-    a = self.from_stack()
-    self.expect_number()
-    self.bool_to_stack(self.from_stack() == false or a == false)
+def nand(ctx):
+    ctx.expect_number()
+    a = ctx.from_stack()
+    ctx.expect_number()
+    ctx.bool_to_stack(ctx.from_stack() == false or a == false)
 
-def equal(self):
-    self.expect_something()
-    a = self.from_stack()
-    self.expect_something()
-    self.bool_to_stack(a == self.from_stack())
+def equal(ctx):
+    ctx.expect_something()
+    a = ctx.from_stack()
+    ctx.expect_something()
+    ctx.bool_to_stack(a == ctx.from_stack())
 
-def greater(self):
-    self.expect_number()
-    a = self.from_stack()
-    self.expect_number()
-    self.bool_to_stack(self.from_stack() > a)
+def greater(ctx):
+    ctx.expect_number()
+    a = ctx.from_stack()
+    ctx.expect_number()
+    ctx.bool_to_stack(ctx.from_stack() > a)
 
-def inc(self):
-    self.expect_number()
-    self.to_stack(1 + self.from_stack())
+def inc(ctx):
+    ctx.expect_number()
+    ctx.to_stack(1 + ctx.from_stack())
 
-def plus(self):
-    self.expect_number()
-    a = self.from_stack()
-    self.expect_number()
-    self.to_stack(a + self.from_stack())
+def plus(ctx):
+    ctx.expect_number()
+    a = ctx.from_stack()
+    ctx.expect_number()
+    ctx.to_stack(a + ctx.from_stack())
 
-def negate(self):
-    self.expect_number()
-    self.to_stack(-self.from_stack())
+def negate(ctx):
+    ctx.expect_number()
+    ctx.to_stack(-ctx.from_stack())
 
-def multiply(self):
-    self.expect_number()
-    a = self.from_stack()
-    self.expect_number()
-    self.to_stack(a * self.from_stack())
+def multiply(ctx):
+    ctx.expect_number()
+    a = ctx.from_stack()
+    ctx.expect_number()
+    ctx.to_stack(a * ctx.from_stack())
 
-def qdivmod(self):
-    self.expect_number()
-    a = self.from_stack()
+def qdivmod(ctx):
+    ctx.expect_number()
+    a = ctx.from_stack()
     if a == 0:
-        self.failed('Division by zero.')
-    self.expect_number()
-    results = divmod(self.from_stack(), a)
-    self.to_stack(results[0])
-    self.to_stack(results[1])
+        ctx.failed('Division by zero.')
+    ctx.expect_number()
+    results = divmod(ctx.from_stack(), a)
+    ctx.to_stack(results[0])
+    ctx.to_stack(results[1])
 
-def exponentiate(self):
-    self.expect_number()
-    a = self.from_stack()
+def exponentiate(ctx):
+    ctx.expect_number()
+    a = ctx.from_stack()
     if a < 0:
-        self.failed('Tried to raise to a negative power: ' + str(a))
-    self.expect_number()
-    self.to_stack(self.from_stack() ** a)
+        ctx.failed('Tried to raise to a negative power: ' + str(a))
+    ctx.expect_number()
+    ctx.to_stack(ctx.from_stack() ** a)
 
-def shift_left(self):
-    self.expect_number()
-    a = self.from_stack()
+def shift_left(ctx):
+    ctx.expect_number()
+    a = ctx.from_stack()
     if a < 0:
-        self.failed('Cannot << by a negative amount: ' + str(a))
-    self.expect_number()
-    self.to_stack(self.from_stack() << a)
+        ctx.failed('Cannot << by a negative amount: ' + str(a))
+    ctx.expect_number()
+    ctx.to_stack(ctx.from_stack() << a)
 
-def shift_right(self):
-    self.expect_number()
-    a = self.from_stack()
+def shift_right(ctx):
+    ctx.expect_number()
+    a = ctx.from_stack()
     if a < 0:
-        self.failed('Cannot >> by a negative amount: ' + str(a))
-    self.expect_number()
-    self.to_stack(self.from_stack() >> a)
+        ctx.failed('Cannot >> by a negative amount: ' + str(a))
+    ctx.expect_number()
+    ctx.to_stack(ctx.from_stack() >> a)
 
-def bitwise_and(self):
-    self.expect_number()
-    a = self.from_stack()
-    self.expect_number()
-    self.to_stack(a & self.from_stack())
+def bitwise_and(ctx):
+    ctx.expect_number()
+    a = ctx.from_stack()
+    ctx.expect_number()
+    ctx.to_stack(a & ctx.from_stack())
 
-def bitwise_or(self):
-    self.expect_number()
-    a = self.from_stack()
-    self.expect_number()
-    self.to_stack(a | self.from_stack())
+def bitwise_or(ctx):
+    ctx.expect_number()
+    a = ctx.from_stack()
+    ctx.expect_number()
+    ctx.to_stack(a | ctx.from_stack())
 
-def bitwise_xor(self):
-    self.expect_number()
-    a = self.from_stack()
-    self.expect_number()
-    self.to_stack(a ^ self.from_stack())
+def bitwise_xor(ctx):
+    ctx.expect_number()
+    a = ctx.from_stack()
+    ctx.expect_number()
+    ctx.to_stack(a ^ ctx.from_stack())
 
-def bitwise_not(self):
-    self.expect_number()
-    self.to_stack(~self.from_stack())
+def bitwise_not(ctx):
+    ctx.expect_number()
+    ctx.to_stack(~ctx.from_stack())
 
-def qtime(self):
-    self.to_stack(int(time.time()*1000000))
+def qtime(ctx):
+    ctx.to_stack(int(time.time()*1000000))
 
-def meta_done(self):
-    self.from_return()
-    self.from_return()
+def meta_done(ctx):
+    ctx.from_return()
+    ctx.from_return()
 
-def meta_again(self):
-    self.from_return()
-    self.to_return(-1)
+def meta_again(ctx):
+    ctx.from_return()
+    ctx.to_return(-1)
 
-def meta_if(self):
-    self.expect_number()
-    if self.from_stack() == 0:
-        self.to_return(self.from_return() + 1)
+def meta_if(ctx):
+    ctx.expect_number()
+    if ctx.from_stack() == 0:
+        ctx.to_return(ctx.from_return() + 1)
 
-def meta_iff(self):
-    self.expect_number()
-    if self.from_stack() == 0:
-        self.to_return(self.from_return() + 2)
+def meta_iff(ctx):
+    ctx.expect_number()
+    if ctx.from_stack() == 0:
+        ctx.to_return(ctx.from_return() + 2)
 
-def meta_else(self):
-    self.to_return(self.from_return() + 1)
+def meta_else(ctx):
+    ctx.to_return(ctx.from_return() + 1)
 
-def meta_literal(self):
-    pc = self.from_return() + 1
-    return_nest = self.from_return()
+def meta_literal(ctx):
+    pc = ctx.from_return() + 1
+    return_nest = ctx.from_return()
     if len(return_nest) == pc:
-        self.failed('Found a "\'" at the end of a nest.')
-    self.to_stack(return_nest[pc])
-    self.to_return(return_nest)
-    self.to_return(pc)
+        ctx.failed('Found a "\'" at the end of a nest.')
+    ctx.to_stack(return_nest[pc])
+    ctx.to_return(return_nest)
+    ctx.to_return(pc)
 
-def meta_this(self):
-    pc = self.from_return()
-    return_nest = self.from_return()
-    self.to_stack(return_nest)
-    self.to_return(return_nest)
-    self.to_return(pc)
+def meta_this(ctx):
+    pc = ctx.from_return()
+    return_nest = ctx.from_return()
+    ctx.to_stack(return_nest)
+    ctx.to_return(return_nest)
+    ctx.to_return(pc)
 
-def meta_do(self):
-    self.expect_something()
-    the_thing = self.from_stack()
+def meta_do(ctx):
+    ctx.expect_something()
+    the_thing = ctx.from_stack()
     if not isNest(the_thing):
         the_thing = [the_thing]
-    self.to_return(the_thing)
-    self.to_return(-1)
+    ctx.to_return(the_thing)
+    ctx.to_return(-1)
 
-def meta_bail_by(self):
-    self.expect_number()
-    a = 2 * self.from_stack()
-    if a <= len(self.rstack):
+def meta_bail_by(ctx):
+    ctx.expect_number()
+    a = 2 * ctx.from_stack()
+    if a <= len(ctx.rstack):
         for _ in range(a):
-            self.from_return()
+            ctx.from_return()
     else:
-        self.failed('Bailed out of Quackery.')
+        ctx.failed('Bailed out of Quackery.')
 
-def qput(self):
-    self.expect_nest()
-    a = self.from_stack()
-    self.expect_something()
-    b = self.from_stack()
+def qput(ctx):
+    ctx.expect_nest()
+    a = ctx.from_stack()
+    ctx.expect_something()
+    b = ctx.from_stack()
     a.append(b)
 
-def immovable(self):
+def immovable(ctx):
     pass
 
-def take(self):
-    self.expect_nest()
-    a = self.from_stack()
+def take(ctx):
+    ctx.expect_nest()
+    a = ctx.from_stack()
     if len(a) == 0:
-        self.failed('Unexpectedly empty nest.')
+        ctx.failed('Unexpectedly empty nest.')
     if len(a) == 1:
         if isNest(a[0]) and len(a[0]) > 0 and a[0][0] == immovable:
-            self.failed('Cannot remove an immovable item.')
-    self.to_stack(a.pop())
+            ctx.failed('Cannot remove an immovable item.')
+    ctx.to_stack(a.pop())
 
-def create_nest(self):
-    self.to_stack([])
+def create_nest(ctx):
+    ctx.to_stack([])
 
-def qsplit(self):
-    self.expect_number()
-    a = self.from_stack()
-    self.expect_nest()
-    b = self.from_stack()
-    self.to_stack(b[:a])
-    self.to_stack(b[a:])
+def qsplit(ctx):
+    ctx.expect_number()
+    a = ctx.from_stack()
+    ctx.expect_nest()
+    b = ctx.from_stack()
+    ctx.to_stack(b[:a])
+    ctx.to_stack(b[a:])
 
-def join(self):
-    self.expect_something()
-    b = self.from_stack()
+def join(ctx):
+    ctx.expect_something()
+    b = ctx.from_stack()
     if not isNest(b):
         b = [b]
-    self.expect_something()
+    ctx.expect_something()
     a = from_stack()
     if not isNest(a):
         a = [a]
-    self.to_stack(a + b)
+    ctx.to_stack(a + b)
 
-def qsize(self):
-    self.expect_nest()
-    self.to_stack(len(self.from_stack()))
+def qsize(ctx):
+    ctx.expect_nest()
+    ctx.to_stack(len(ctx.from_stack()))
 
-def qfind(self):
-    self.expect_nest()
-    nest = self.from_stack()
-    self.expect_something()
-    a = self.from_stack()
+def qfind(ctx):
+    ctx.expect_nest()
+    nest = ctx.from_stack()
+    ctx.expect_something()
+    a = ctx.from_stack()
     if a in nest:
-        self.to_stack(nest.index(a))
+        ctx.to_stack(nest.index(a))
     else:
-        self.to_stack(len(nest))
+        ctx.to_stack(len(nest))
 
-def peek(self):
-    self.expect_number()
-    index = self.from_stack()
-    self.expect_nest()
-    nest = self.from_stack()
+def peek(ctx):
+    ctx.expect_number()
+    index = ctx.from_stack()
+    ctx.expect_nest()
+    nest = ctx.from_stack()
     if index >= len(nest) or (
         index < 0 and len(nest) < abs(index)):
         failed('Cannot peek an item outside a nest.')
     else:
         to_stack(nest[index])
 
-def poke(self):
-    self.expect_number()
-    index = self.from_stack()
-    self.expect_nest()
-    nest = self.from_stack().copy()
-    self.expect_something()
-    value = self.from_stack()
+def poke(ctx):
+    ctx.expect_number()
+    index = ctx.from_stack()
+    ctx.expect_nest()
+    nest = ctx.from_stack().copy()
+    ctx.expect_something()
+    value = ctx.from_stack()
     if index >= len(nest) or (
         index < 0 and len(nest) < abs(index)):
-        self.failed('Cannot poke an item outside a nest.')
+        ctx.failed('Cannot poke an item outside a nest.')
     else:
         nest[index] = value
-        self.to_stack(nest)
+        ctx.to_stack(nest)
 
-def qnest(self):
-    self.expect_something()
-    self.bool_to_stack(isNest(self.from_stack()))
+def qnest(ctx):
+    ctx.expect_something()
+    ctx.bool_to_stack(isNest(ctx.from_stack()))
 
-def qnumber(self):
-    self.expect_something()
-    self.bool_to_stack(isNumber(self.from_stack()))
+def qnumber(ctx):
+    ctx.expect_something()
+    ctx.bool_to_stack(isNumber(ctx.from_stack()))
 
-def qoperator(self):
-    self.expect_something()
-    self.bool_to_stack(isOperator(self.from_stack()))
+def qoperator(ctx):
+    ctx.expect_something()
+    ctx.bool_to_stack(isOperator(ctx.from_stack()))
 
-def quid(self):
-    self.expect_something()
-    self.to_stack(id(self.from_stack()))
+def quid(ctx):
+    ctx.expect_something()
+    ctx.to_stack(id(ctx.from_stack()))
 
-def qemit(self):
-    self.expect_number()
-    char = self.from_stack()
+def qemit(ctx):
+    ctx.expect_number()
+    char = ctx.from_stack()
     if char == 13:
         sys.stdout.write('\n')
     elif 31 < char < 127:
@@ -545,25 +545,25 @@ def qemit(self):
     else:
         sys.stdout.write('?') # XXX @dragoncoder047 maybe use \uFFFD on platforms that support unicode?
 
-def ding(self):
+def ding(ctx):
     sys.stdout.write('\a')
 
-def qinput(self):
-    prompt = self.string_from_stack()
-    self.string_to_stack(input(prompt))
+def qinput(ctx):
+    prompt = ctx.string_from_stack()
+    ctx.string_to_stack(input(prompt))
 
 filepath = []
 
-def putfile(self):
-    filename = self.string_from_stack()
+def putfile(ctx):
+    filename = ctx.string_from_stack()
     if len(filepath) > 1:
-        self.to_stack(filepath[-1])
-        filename = self.string_from_stack() + filename
-    filetext = self.string_from_stack()
+        ctx.to_stack(filepath[-1])
+        filename = ctx.string_from_stack() + filename
+    filetext = ctx.string_from_stack()
     try:
         with open(filename, 'x'): pass
     except FileExistsError:
-        self.to_stack(false)
+        ctx.to_stack(false)
     except:
         raise
     else:
@@ -572,29 +572,29 @@ def putfile(self):
         except:
             raise
         else:
-            self.to_stack(true)
+            ctx.to_stack(true)
 
-def releasefile(self):
+def releasefile(ctx):
     nonlocal filepath
-    filename = self.string_from_stack()
+    filename = ctx.string_from_stack()
     if len(filepath) > 1:
-        self.to_stack(filepath[-1])
-        filename = self.string_from_stack() + filename
+        ctx.to_stack(filepath[-1])
+        filename = ctx.string_from_stack() + filename
     try:
         os.remove(filename)
     except FileNotFoundError:
-        self.to_stack(false)
+        ctx.to_stack(false)
     except:
         raise
     else:
-        self.to_stack(true)
+        ctx.to_stack(true)
 
-def sharefile(self):
-    dup(self)
-    filename = self.string_from_stack()
+def sharefile(ctx):
+    dup(ctx)
+    filename = ctx.string_from_stack()
     if len(filepath) > 1:
-        self.to_stack(filepath[-1])
-        filename = self.string_from_stack() + filename
+        ctx.to_stack(filepath[-1])
+        filename = ctx.string_from_stack() + filename
     try:
         with open(filename) as f: filetext = f.read()
     except FileNotFoundError:
@@ -602,9 +602,9 @@ def sharefile(self):
     except:
         raise
     else:
-        drop(self)
-        self.string_to_stack(filetext)
-        self.to_stack(true)
+        drop(ctx)
+        ctx.string_to_stack(filetext)
+        ctx.to_stack(true)
 
 predefined_operators = {
     'python':      python,       # (     $ -->       )
@@ -665,66 +665,66 @@ predefined_operators = {
     'sharefile':   sharefile     # (     $ --> $ b   )
 }
 
-def qis(self):
-    self.check_build()
-    name = self.get_name()
-    self.operators[name] = self.current_build.pop()
+def qis(ctx):
+    ctx.check_build()
+    name = ctx.get_name()
+    ctx.operators[name] = ctx.current_build.pop()
 
-def qcomment(self):
+def qcomment(ctx):
     word = ''
     while word != ')':
-        word = self.next_word()
+        word = ctx.next_word()
         if word == '':
             raise EOFError('Unclosed comment.')
 
-def endcomment(self):
+def endcomment(ctx):
     raise SyntaxError('Too many end of comments.')
 
-def unresolved(self):
+def unresolved(ctx):
     raise TypeError('Unresolved forward reference.')
 
-def forward(self):
-    self.current_build.append([unresolved])
+def forward(ctx):
+    ctx.current_build.append([unresolved])
 
-def resolves(self):
-    name = self.get_name()
-    if name in self.operators:
-        if self.operators[name][0] != unresolved:
+def resolves(ctx):
+    name = ctx.get_name()
+    if name in ctx.operators:
+        if ctx.operators[name][0] != unresolved:
             raise TypeError(name + ' is not a forward reference.')
-        self.check_build()
+        ctx.check_build()
         operators[name][0] = current_build.pop()
     else:
         raise NameError('Unrecognised word: ' + name)
 
-def char_literal(self):
-    char = self.one_char()
+def char_literal(ctx):
+    char = ctx.one_char()
     if char == '':
         raise SyntaxError('No character found.')
-    self.current_build.append(ord(char))
+    ctx.current_build.append(ord(char))
 
-def string_literal(self):
+def string_literal(ctx):
     delimiter = ''
     result = []
     while delimiter == '':
-        char = self.next_char()
+        char = ctx.next_char()
         if char == '':
             raise EOFError('No string found.')
         if ord(char) > 32:
             delimiter = char
             char = ''
     while char != delimiter:
-        char = self.next_char()
+        char = ctx.next_char()
         if char == '':
             raise EOFError('Endless string discovered.')
         if char != delimiter:
             result.append(ord(char))
-    self.current_build.append([[meta_literal], result])
+    ctx.current_build.append([[meta_literal], result])
 
-def hexnum(self):
-    word = self.get_name()
+def hexnum(ctx):
+    word = ctx.get_name()
     if not ishex(word):
         raise SyntaxError(word + " is not hexadecimal.")
-    self.current_build.append(int(word, 16))
+    ctx.current_build.append(int(word, 16))
 
 predefined_builders = {
     'is':       qis,
@@ -1636,23 +1636,23 @@ predefined_qky = r"""
                   """
 
 # bootstrap only once
-_qs = QuackeryState()
+_qs = QuackeryContext()
 _qs.bootstrap()
 predefined_operators = _qs.operators
 del _qs
 
 
-def quackery(source_string, self = None):
+def quackery(source_string, ctx = None):
 
-    if self is None:
-        self = QuackeryState()
+    if ctx is None:
+        ctx = QuackeryContext()
     else:
-        if 'quackery' not in self.operators.keys():
-            raise NameError('QuackeryState must have word `quackery` defined.')
+        if 'quackery' not in ctx.operators.keys():
+            raise NameError('QuackeryContext must have word `quackery` defined.')
 
     while True:
-        self.to_stack([ord(char) for char in source_string])
-        try: self.run('quackery')
+        ctx.to_stack([ord(char) for char in source_string])
+        try: ctx.run('quackery')
         except QuackeryError as diagnostics:
             if __name__ == '__main__' and len(sys.argv) == 1:
                 print(diagnostics)
@@ -1664,8 +1664,8 @@ def quackery(source_string, self = None):
             print('Python error: ' + str(diagnostics))
             raise
         else:
-            self.run('stacksize pack decimal unbuild')
-            the_stack = self.from_stack()
+            ctx.run('stacksize pack decimal unbuild')
+            the_stack = ctx.from_stack()
             return ''.join(map(chr, the_stack[2:-2]))
 
 if __name__ == '__main__':

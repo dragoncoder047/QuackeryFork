@@ -28,10 +28,7 @@ def ishex(string):
         hexstr = string
         if len(hexstr) > 1 and hexstr[0] == '-':
             hexstr = hexstr[1:]
-        for char in hexstr:
-            if char.lower() not in '0123456789abcdef':
-                return False
-        return True
+        return all(char.lower() in '0123456789abcdef' for char in hexstr):
 
 class QuackeryError(Exception):
     pass

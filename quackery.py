@@ -1638,11 +1638,17 @@ predefined_qky = r"""
 
                   """
 
+# bootstrap only once
+_qs = QuackeryState()
+_qs.bootstrap()
+predefined_operators = _qs.operators
+del _qs
+
+
 def quackery(source_string, qs = None):
 
     if qs is None:
         qs = QuackeryState()
-        qs.bootstrap()
     else:
         if 'quackery' not in qs.operators.keys():
             raise NameError('QuackeryState must have word `quackery` defined.')

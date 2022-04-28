@@ -232,315 +232,315 @@ class QuackeryState:
 
 
 
-def python(qs):
+def python(self):
     """For backwards compatibility only"""
     scope = {
-        "to_stack": qs.to_stack,
-        "from_stack": qs.from_stack,
-        "string_to_stack": qs.string_to_stack,
-        "string_from_stack": qs.string_from_stack,
-        "qs": qs,
+        "to_stack": self.to_stack,
+        "from_stack": self.from_stack,
+        "string_to_stack": self.string_to_stack,
+        "string_from_stack": self.string_from_stack,
+        "self": self,
     }
     try:
-        exec(qs.string_from_stack(), scope, globals())
+        exec(self.string_from_stack(), scope, globals())
     except QuackeryError:
         raise
     except Exception as diagnostics:
-        qs.failed('Python reported: "' + str(diagnostics) + '"')
+        self.failed('Python reported: "' + str(diagnostics) + '"')
 
-def qfail(qs):
-    qs.failed(qs.string_from_stack())
+def qfail(self):
+    self.failed(self.string_from_stack())
 
-def stack_size(qs):
-    qs.to_stack(len(qs.qstack))
+def stack_size(self):
+    self.to_stack(len(self.qstack))
 
-def qreturn(qs):
-    qs.to_stack(qs.rstack)
+def qreturn(self):
+    self.to_stack(self.rstack)
 
-def dup(qs):
-    a = qs.from_stack()
-    qs.to_stack(a)
-    qs.to_stack(a)
+def dup(self):
+    a = self.from_stack()
+    self.to_stack(a)
+    self.to_stack(a)
 
-def drop(qs):
-    qs.from_stack()
+def drop(self):
+    self.from_stack()
 
-def swap(qs):
-    a = qs.from_stack()
-    b = qs.from_stack()
-    qs.to_stack(a)
-    qs.to_stack(b)
+def swap(self):
+    a = self.from_stack()
+    b = self.from_stack()
+    self.to_stack(a)
+    self.to_stack(b)
 
-def rot(qs): # XXX @dragoncoder047 maybe simplify to [ dip swap swap ] is rot ? There are no cyclic references that would prevent this
-    a = qs.from_stack()
-    swap(qs)
-    qs.to_stack(a)
-    swap(qs)
+def rot(self): # XXX @dragoncoder047 maybe simplify to [ dip swap swap ] is rot ? There are no cyclic references that would prevent this
+    a = self.from_stack()
+    swap(self)
+    self.to_stack(a)
+    swap(self)
 
-def over(qs): # XXX @dragoncoder047 maybe simplify to [ dip dup swap ] is over ? same reason as above
-    a = qs.from_stack()
-    dup(qs)
-    qs.to_stack(a)
-    swap(qs)
+def over(self): # XXX @dragoncoder047 maybe simplify to [ dip dup swap ] is over ? same reason as above
+    a = self.from_stack()
+    dup(self)
+    self.to_stack(a)
+    swap(self)
 
-def nest_depth(qs):
-    qs.to_stack(len(qs.rstack) // 2)
+def nest_depth(self):
+    self.to_stack(len(self.rstack) // 2)
 
 true = 1
 
 false = 0
 
-def nand(qs):
-    qs.expect_number()
-    a = qs.from_stack()
-    qs.expect_number()
-    qs.bool_to_stack(qs.from_stack() == false or a == false)
+def nand(self):
+    self.expect_number()
+    a = self.from_stack()
+    self.expect_number()
+    self.bool_to_stack(self.from_stack() == false or a == false)
 
-def equal(qs):
-    qs.expect_something()
-    a = qs.from_stack()
-    qs.expect_something()
-    qs.bool_to_stack(a == qs.from_stack())
+def equal(self):
+    self.expect_something()
+    a = self.from_stack()
+    self.expect_something()
+    self.bool_to_stack(a == self.from_stack())
 
-def greater(qs):
-    qs.expect_number()
-    a = qs.from_stack()
-    qs.expect_number()
-    qs.bool_to_stack(qs.from_stack() > a)
+def greater(self):
+    self.expect_number()
+    a = self.from_stack()
+    self.expect_number()
+    self.bool_to_stack(self.from_stack() > a)
 
-def inc(qs):
-    qs.expect_number()
-    qs.to_stack(1 + qs.from_stack())
+def inc(self):
+    self.expect_number()
+    self.to_stack(1 + self.from_stack())
 
-def plus(qs):
-    qs.expect_number()
-    a = qs.from_stack()
-    qs.expect_number()
-    qs.to_stack(a + qs.from_stack())
+def plus(self):
+    self.expect_number()
+    a = self.from_stack()
+    self.expect_number()
+    self.to_stack(a + self.from_stack())
 
-def negate(qs):
-    qs.expect_number()
-    qs.to_stack(-qs.from_stack())
+def negate(self):
+    self.expect_number()
+    self.to_stack(-self.from_stack())
 
-def multiply(qs):
-    qs.expect_number()
-    a = qs.from_stack()
-    qs.expect_number()
-    qs.to_stack(a * qs.from_stack())
+def multiply(self):
+    self.expect_number()
+    a = self.from_stack()
+    self.expect_number()
+    self.to_stack(a * self.from_stack())
 
-def qdivmod(qs):
-    qs.expect_number()
-    a = qs.from_stack()
+def qdivmod(self):
+    self.expect_number()
+    a = self.from_stack()
     if a == 0:
-        qs.failed('Division by zero.')
-    qs.expect_number()
-    results = divmod(qs.from_stack(), a)
-    qs.to_stack(results[0])
-    qs.to_stack(results[1])
+        self.failed('Division by zero.')
+    self.expect_number()
+    results = divmod(self.from_stack(), a)
+    self.to_stack(results[0])
+    self.to_stack(results[1])
 
-def exponentiate(qs):
-    qs.expect_number()
-    a = qs.from_stack()
+def exponentiate(self):
+    self.expect_number()
+    a = self.from_stack()
     if a < 0:
-        qs.failed('Tried to raise to a negative power: ' + str(a))
-    qs.expect_number()
-    qs.to_stack(qs.from_stack() ** a)
+        self.failed('Tried to raise to a negative power: ' + str(a))
+    self.expect_number()
+    self.to_stack(self.from_stack() ** a)
 
-def shift_left(qs):
-    qs.expect_number()
-    a = qs.from_stack()
+def shift_left(self):
+    self.expect_number()
+    a = self.from_stack()
     if a < 0:
-        qs.failed('Cannot << by a negative amount: ' + str(a))
-    qs.expect_number()
-    qs.to_stack(qs.from_stack() << a)
+        self.failed('Cannot << by a negative amount: ' + str(a))
+    self.expect_number()
+    self.to_stack(self.from_stack() << a)
 
-def shift_right(qs):
-    qs.expect_number()
-    a = qs.from_stack()
+def shift_right(self):
+    self.expect_number()
+    a = self.from_stack()
     if a < 0:
-        qs.failed('Cannot >> by a negative amount: ' + str(a))
-    qs.expect_number()
-    qs.to_stack(qs.from_stack() >> a)
+        self.failed('Cannot >> by a negative amount: ' + str(a))
+    self.expect_number()
+    self.to_stack(self.from_stack() >> a)
 
-def bitwise_and(qs):
-    qs.expect_number()
-    a = qs.from_stack()
-    qs.expect_number()
-    qs.to_stack(a & qs.from_stack())
+def bitwise_and(self):
+    self.expect_number()
+    a = self.from_stack()
+    self.expect_number()
+    self.to_stack(a & self.from_stack())
 
-def bitwise_or(qs):
-    qs.expect_number()
-    a = qs.from_stack()
-    qs.expect_number()
-    qs.to_stack(a | qs.from_stack())
+def bitwise_or(self):
+    self.expect_number()
+    a = self.from_stack()
+    self.expect_number()
+    self.to_stack(a | self.from_stack())
 
-def bitwise_xor(qs):
-    qs.expect_number()
-    a = qs.from_stack()
-    qs.expect_number()
-    qs.to_stack(a ^ qs.from_stack())
+def bitwise_xor(self):
+    self.expect_number()
+    a = self.from_stack()
+    self.expect_number()
+    self.to_stack(a ^ self.from_stack())
 
-def bitwise_not(qs):
-    qs.expect_number()
-    qs.to_stack(~qs.from_stack())
+def bitwise_not(self):
+    self.expect_number()
+    self.to_stack(~self.from_stack())
 
-def qtime(qs):
-    qs.to_stack(int(time.time()*1000000))
+def qtime(self):
+    self.to_stack(int(time.time()*1000000))
 
-def meta_done(qs):
-    qs.from_return()
-    qs.from_return()
+def meta_done(self):
+    self.from_return()
+    self.from_return()
 
-def meta_again(qs):
-    qs.from_return()
-    qs.to_return(-1)
+def meta_again(self):
+    self.from_return()
+    self.to_return(-1)
 
-def meta_if(qs):
-    qs.expect_number()
-    if qs.from_stack() == 0:
-        qs.to_return(qs.from_return() + 1)
+def meta_if(self):
+    self.expect_number()
+    if self.from_stack() == 0:
+        self.to_return(self.from_return() + 1)
 
-def meta_iff(qs):
-    qs.expect_number()
-    if qs.from_stack() == 0:
-        qs.to_return(qs.from_return() + 2)
+def meta_iff(self):
+    self.expect_number()
+    if self.from_stack() == 0:
+        self.to_return(self.from_return() + 2)
 
-def meta_else(qs):
-    qs.to_return(qs.from_return() + 1)
+def meta_else(self):
+    self.to_return(self.from_return() + 1)
 
-def meta_literal(qs):
-    pc = qs.from_return() + 1
-    return_nest = qs.from_return()
+def meta_literal(self):
+    pc = self.from_return() + 1
+    return_nest = self.from_return()
     if len(return_nest) == pc:
-        qs.failed('Found a "\'" at the end of a nest.')
-    qs.to_stack(return_nest[pc])
-    qs.to_return(return_nest)
-    qs.to_return(pc)
+        self.failed('Found a "\'" at the end of a nest.')
+    self.to_stack(return_nest[pc])
+    self.to_return(return_nest)
+    self.to_return(pc)
 
-def meta_this(qs):
-    pc = qs.from_return()
-    return_nest = qs.from_return()
-    qs.to_stack(return_nest)
-    qs.to_return(return_nest)
-    qs.to_return(pc)
+def meta_this(self):
+    pc = self.from_return()
+    return_nest = self.from_return()
+    self.to_stack(return_nest)
+    self.to_return(return_nest)
+    self.to_return(pc)
 
-def meta_do(qs):
-    qs.expect_something()
-    the_thing = qs.from_stack()
+def meta_do(self):
+    self.expect_something()
+    the_thing = self.from_stack()
     if not isNest(the_thing):
         the_thing = [the_thing]
-    qs.to_return(the_thing)
-    qs.to_return(-1)
+    self.to_return(the_thing)
+    self.to_return(-1)
 
-def meta_bail_by(qs):
-    qs.expect_number()
-    a = 2 * qs.from_stack()
-    if a <= len(qs.rstack):
+def meta_bail_by(self):
+    self.expect_number()
+    a = 2 * self.from_stack()
+    if a <= len(self.rstack):
         for _ in range(a):
-            qs.from_return()
+            self.from_return()
     else:
-        qs.failed('Bailed out of Quackery.')
+        self.failed('Bailed out of Quackery.')
 
-def qput(qs):
-    qs.expect_nest()
-    a = qs.from_stack()
-    qs.expect_something()
-    b = qs.from_stack()
+def qput(self):
+    self.expect_nest()
+    a = self.from_stack()
+    self.expect_something()
+    b = self.from_stack()
     a.append(b)
 
-def immovable(qs):
+def immovable(self):
     pass
 
-def take(qs):
-    qs.expect_nest()
-    a = qs.from_stack()
+def take(self):
+    self.expect_nest()
+    a = self.from_stack()
     if len(a) == 0:
-        qs.failed('Unexpectedly empty nest.')
+        self.failed('Unexpectedly empty nest.')
     if len(a) == 1:
         if isNest(a[0]) and len(a[0]) > 0 and a[0][0] == immovable:
-            qs.failed('Cannot remove an immovable item.')
-    qs.to_stack(a.pop())
+            self.failed('Cannot remove an immovable item.')
+    self.to_stack(a.pop())
 
-def create_nest(qs):
-    qs.to_stack([])
+def create_nest(self):
+    self.to_stack([])
 
-def qsplit(qs):
-    qs.expect_number()
-    a = qs.from_stack()
-    qs.expect_nest()
-    b = qs.from_stack()
-    qs.to_stack(b[:a])
-    qs.to_stack(b[a:])
+def qsplit(self):
+    self.expect_number()
+    a = self.from_stack()
+    self.expect_nest()
+    b = self.from_stack()
+    self.to_stack(b[:a])
+    self.to_stack(b[a:])
 
-def join(qs):
-    qs.expect_something()
-    b = qs.from_stack()
+def join(self):
+    self.expect_something()
+    b = self.from_stack()
     if not isNest(b):
         b = [b]
-    qs.expect_something()
+    self.expect_something()
     a = from_stack()
     if not isNest(a):
         a = [a]
-    qs.to_stack(a + b)
+    self.to_stack(a + b)
 
-def qsize(qs):
-    qs.expect_nest()
-    qs.to_stack(len(qs.from_stack()))
+def qsize(self):
+    self.expect_nest()
+    self.to_stack(len(self.from_stack()))
 
-def qfind(qs):
-    qs.expect_nest()
-    nest = qs.from_stack()
-    qs.expect_something()
-    a = qs.from_stack()
+def qfind(self):
+    self.expect_nest()
+    nest = self.from_stack()
+    self.expect_something()
+    a = self.from_stack()
     if a in nest:
-        qs.to_stack(nest.index(a))
+        self.to_stack(nest.index(a))
     else:
-        qs.to_stack(len(nest))
+        self.to_stack(len(nest))
 
-def peek(qs):
-    qs.expect_number()
-    index = qs.from_stack()
-    qs.expect_nest()
-    nest = qs.from_stack()
+def peek(self):
+    self.expect_number()
+    index = self.from_stack()
+    self.expect_nest()
+    nest = self.from_stack()
     if index >= len(nest) or (
         index < 0 and len(nest) < abs(index)):
         failed('Cannot peek an item outside a nest.')
     else:
         to_stack(nest[index])
 
-def poke(qs):
-    qs.expect_number()
-    index = qs.from_stack()
-    qs.expect_nest()
-    nest = qs.from_stack().copy()
-    qs.expect_something()
-    value = qs.from_stack()
+def poke(self):
+    self.expect_number()
+    index = self.from_stack()
+    self.expect_nest()
+    nest = self.from_stack().copy()
+    self.expect_something()
+    value = self.from_stack()
     if index >= len(nest) or (
         index < 0 and len(nest) < abs(index)):
-        qs.failed('Cannot poke an item outside a nest.')
+        self.failed('Cannot poke an item outside a nest.')
     else:
         nest[index] = value
-        qs.to_stack(nest)
+        self.to_stack(nest)
 
-def qnest(qs):
-    qs.expect_something()
-    qs.bool_to_stack(isNest(qs.from_stack()))
+def qnest(self):
+    self.expect_something()
+    self.bool_to_stack(isNest(self.from_stack()))
 
-def qnumber(qs):
-    qs.expect_something()
-    qs.bool_to_stack(isNumber(qs.from_stack()))
+def qnumber(self):
+    self.expect_something()
+    self.bool_to_stack(isNumber(self.from_stack()))
 
-def qoperator(qs):
-    qs.expect_something()
-    qs.bool_to_stack(isOperator(qs.from_stack()))
+def qoperator(self):
+    self.expect_something()
+    self.bool_to_stack(isOperator(self.from_stack()))
 
-def quid(qs):
-    qs.expect_something()
-    qs.to_stack(id(qs.from_stack()))
+def quid(self):
+    self.expect_something()
+    self.to_stack(id(self.from_stack()))
 
-def qemit(qs):
-    qs.expect_number()
-    char = qs.from_stack()
+def qemit(self):
+    self.expect_number()
+    char = self.from_stack()
     if char == 13:
         sys.stdout.write('\n')
     elif 31 < char < 127:
@@ -548,25 +548,25 @@ def qemit(qs):
     else:
         sys.stdout.write('?') # XXX @dragoncoder047 maybe use \uFFFD on platforms that support unicode?
 
-def ding(qs):
+def ding(self):
     sys.stdout.write('\a')
 
-def qinput(qs):
-    prompt = qs.string_from_stack()
-    qs.string_to_stack(input(prompt))
+def qinput(self):
+    prompt = self.string_from_stack()
+    self.string_to_stack(input(prompt))
 
 filepath = []
 
-def putfile(qs):
-    filename = qs.string_from_stack()
+def putfile(self):
+    filename = self.string_from_stack()
     if len(filepath) > 1:
-        qs.to_stack(filepath[-1])
-        filename = qs.string_from_stack() + filename
-    filetext = qs.string_from_stack()
+        self.to_stack(filepath[-1])
+        filename = self.string_from_stack() + filename
+    filetext = self.string_from_stack()
     try:
         with open(filename, 'x'): pass
     except FileExistsError:
-        qs.to_stack(false)
+        self.to_stack(false)
     except:
         raise
     else:
@@ -575,29 +575,29 @@ def putfile(qs):
         except:
             raise
         else:
-            qs.to_stack(true)
+            self.to_stack(true)
 
-def releasefile(qs):
+def releasefile(self):
     nonlocal filepath
-    filename = qs.string_from_stack()
+    filename = self.string_from_stack()
     if len(filepath) > 1:
-        qs.to_stack(filepath[-1])
-        filename = qs.string_from_stack() + filename
+        self.to_stack(filepath[-1])
+        filename = self.string_from_stack() + filename
     try:
         os.remove(filename)
     except FileNotFoundError:
-        qs.to_stack(false)
+        self.to_stack(false)
     except:
         raise
     else:
-        qs.to_stack(true)
+        self.to_stack(true)
 
-def sharefile(qs):
-    dup(qs)
-    filename = qs.string_from_stack()
+def sharefile(self):
+    dup(self)
+    filename = self.string_from_stack()
     if len(filepath) > 1:
-        qs.to_stack(filepath[-1])
-        filename = qs.string_from_stack() + filename
+        self.to_stack(filepath[-1])
+        filename = self.string_from_stack() + filename
     try:
         with open(filename) as f: filetext = f.read()
     except FileNotFoundError:
@@ -605,9 +605,9 @@ def sharefile(qs):
     except:
         raise
     else:
-        drop(qs)
-        qs.string_to_stack(filetext)
-        qs.to_stack(true)
+        drop(self)
+        self.string_to_stack(filetext)
+        self.to_stack(true)
 
 predefined_operators = {
     'python':      python,       # (     $ -->       )
@@ -668,66 +668,66 @@ predefined_operators = {
     'sharefile':   sharefile     # (     $ --> $ b   )
 }
 
-def qis(qs):
-    qs.check_build()
-    name = qs.get_name()
-    qs.operators[name] = qs.current_build.pop()
+def qis(self):
+    self.check_build()
+    name = self.get_name()
+    self.operators[name] = self.current_build.pop()
 
-def qcomment(qs):
+def qcomment(self):
     word = ''
     while word != ')':
-        word = qs.next_word()
+        word = self.next_word()
         if word == '':
             raise EOFError('Unclosed comment.')
 
-def endcomment(qs):
+def endcomment(self):
     raise SyntaxError('Too many end of comments.')
 
-def unresolved(qs):
+def unresolved(self):
     raise TypeError('Unresolved forward reference.')
 
-def forward(qs):
-    qs.current_build.append([unresolved])
+def forward(self):
+    self.current_build.append([unresolved])
 
-def resolves(qs):
-    name = qs.get_name()
-    if name in qs.operators:
-        if qs.operators[name][0] != unresolved:
+def resolves(self):
+    name = self.get_name()
+    if name in self.operators:
+        if self.operators[name][0] != unresolved:
             raise TypeError(name + ' is not a forward reference.')
-        qs.check_build()
+        self.check_build()
         operators[name][0] = current_build.pop()
     else:
         raise NameError('Unrecognised word: ' + name)
 
-def char_literal(qs):
-    char = qs.one_char()
+def char_literal(self):
+    char = self.one_char()
     if char == '':
         raise SyntaxError('No character found.')
-    qs.current_build.append(ord(char))
+    self.current_build.append(ord(char))
 
-def string_literal(qs):
+def string_literal(self):
     delimiter = ''
     result = []
     while delimiter == '':
-        char = qs.next_char()
+        char = self.next_char()
         if char == '':
             raise EOFError('No string found.')
         if ord(char) > 32:
             delimiter = char
             char = ''
     while char != delimiter:
-        char = qs.next_char()
+        char = self.next_char()
         if char == '':
             raise EOFError('Endless string discovered.')
         if char != delimiter:
             result.append(ord(char))
-    qs.current_build.append([[meta_literal], result])
+    self.current_build.append([[meta_literal], result])
 
-def hexnum(qs):
-    word = qs.get_name()
+def hexnum(self):
+    word = self.get_name()
     if not ishex(word):
         raise SyntaxError(word + " is not hexadecimal.")
-    qs.current_build.append(int(word, 16))
+    self.current_build.append(int(word, 16))
 
 predefined_builders = {
     'is':       qis,
@@ -1645,17 +1645,17 @@ predefined_operators = _qs.operators
 del _qs
 
 
-def quackery(source_string, qs = None):
+def quackery(source_string, self = None):
 
-    if qs is None:
-        qs = QuackeryState()
+    if self is None:
+        self = QuackeryState()
     else:
-        if 'quackery' not in qs.operators.keys():
+        if 'quackery' not in self.operators.keys():
             raise NameError('QuackeryState must have word `quackery` defined.')
 
     while True:
-        qs.to_stack([ord(char) for char in source_string])
-        try: qs.run('quackery')
+        self.to_stack([ord(char) for char in source_string])
+        try: self.run('quackery')
         except QuackeryError as diagnostics:
             if __name__ == '__main__' and len(sys.argv) == 1:
                 print(diagnostics)
@@ -1667,8 +1667,8 @@ def quackery(source_string, qs = None):
             print('Python error: ' + str(diagnostics))
             raise
         else:
-            qs.run('stacksize pack decimal unbuild')
-            the_stack = qs.from_stack()
+            self.run('stacksize pack decimal unbuild')
+            the_stack = self.from_stack()
             return ''.join(map(chr, the_stack[2:-2]))
 
 if __name__ == '__main__':

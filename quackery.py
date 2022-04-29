@@ -18,17 +18,15 @@ def isNumber(item):
 def isOperator(item):
     return isinstance(item, types.FunctionType)
 
-def isinteger(string):
-    numstr = string
+def isinteger(numstr):
     if len(numstr) > 0 and numstr[0] == '-':
         numstr = numstr[1:]
     return numstr.isdigit()
 
-def ishex(string):
-        hexstr = string
-        if len(hexstr) > 1 and hexstr[0] == '-':
-            hexstr = hexstr[1:]
-        return all(char.lower() in '0123456789abcdef' for char in hexstr)
+def ishex(hexstr):
+    if len(hexstr) > 1 and hexstr[0] == '-':
+        hexstr = hexstr[1:]
+    return all(char.lower() in '0123456789abcdef' for char in hexstr)
 
 class QuackeryError(Exception):
     pass

@@ -125,8 +125,8 @@ class QuackeryContext:
             return
         current_item = self.current_nest[self.program_counter]
         if isNest(current_item):
-            self.to_return(current_nest)
-            self.to_return(program_counter)
+            self.to_return(self.current_nest)
+            self.to_return(self.program_counter)
             self.current_nest = current_item
             self.program_counter = 0
         elif isOperator(current_item):

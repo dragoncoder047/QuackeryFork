@@ -9,6 +9,8 @@ try:
 except:
     pass
 
+__all__ = ['QuackeryContext', 'quackery']
+
 def isNest(item):
     return isinstance(item, list)
 

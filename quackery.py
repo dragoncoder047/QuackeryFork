@@ -104,7 +104,7 @@ class QuackeryContext:
     def to_return(self, item):
         self.rstack.append(item)
 
-    def from_return(self.):
+    def from_return(self):
         if len(self.rstack) == 0:
             self.failed('Return stack unexpectedly empty.')
         return self.rstack.pop()

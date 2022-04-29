@@ -140,9 +140,11 @@ class QuackeryContext:
 
     
     def traverse(self, the_nest):
+        orig_depth = len(self.rstack)
+        self.to_return(self.current_nest)
+        self.to_return(self.program_counter)
         self.current_nest = the_nest
         self.program_counter = 0
-        orig_depth = len(self.rstack)
         while len(self.rstack) > orig_depth:
             self.tick()
     
@@ -176,7 +178,7 @@ class QuackeryContext:
             return char
 
     def get_name(self):
-        name = selfnext_word()
+        name = self.next_word()
         if name == '':
             raise EOFError('Unexpected end of program text.')
         return name
@@ -204,7 +206,7 @@ class QuackeryContext:
                     nesting -= 1
                     if nesting < 0:
                         raise SyntaxError('Unexpected end of nest.')
-                    return(the_nest)
+                    return the_nest
                 elif word in self.builders.keys():
                     self.builders[word](self)
                 elif word in self.operators.keys():
@@ -221,9 +223,6 @@ class QuackeryContext:
 
     def run(self, source_string):
         self.traverse(self.build(source_string))
-
-    def bootstrap(self):
-        self.run(predefined_qky)
 
 
 
@@ -689,7 +688,7 @@ def resolves(ctx):
         if ctx.operators[name][0] != unresolved:
             raise TypeError(name + ' is not a forward reference.')
         ctx.check_build()
-        operators[name][0] = current_build.pop()
+        ctx.operators[name][0] = current_build.pop()
     else:
         raise NameError('Unrecognised word: ' + name)
 
@@ -1634,7 +1633,7 @@ predefined_qky = r"""
 
 # bootstrap only once
 _qs = QuackeryContext()
-_qs.bootstrap()
+_qs.run(predefined_qky)
 predefined_operators = _qs.operators
 del _qs
 
@@ -1644,12 +1643,14 @@ def quackery(source_string, ctx = None):
     if ctx is None:
         ctx = QuackeryContext()
     else:
-        if 'quackery' not in ctx.operators.keys():
-            raise NameError('QuackeryContext must have word `quackery` defined.')
+        for required_word in ('stacksize', 'pack', 'decimal', 'unbuild', 'quackery'):
+            if required_word not in ctx.operators.keys():
+                raise NameError('QuackeryContext must have word %s defined.' % required_word)
 
     while True:
         ctx.to_stack([ord(char) for char in source_string])
-        try: ctx.run('quackery')
+        try:
+            ctx.run('quackery')
         except QuackeryError as diagnostics:
             if __name__ == '__main__' and len(sys.argv) == 1:
                 print(diagnostics)
@@ -1682,6 +1683,7 @@ if __name__ == '__main__':
                 print('\nQuackery crashed.\n')
                 print(diagnostics)
                 print()
+                sys.exit(1)
             except Exception as diagnostics:
                 print('Quackery system damage detected.')
                 print('Python error: ' + str(diagnostics))
@@ -1689,17 +1691,15 @@ if __name__ == '__main__':
     else:
         print('\nWelcome to Quackery.')
         print('\nEnter "leave" to leave the shell.')
-        quackscript = r"""
+        try:
+            quackery(r"""
 
           $ 'extensions.qky' dup name? not
           dip sharefile and iff
             [ cr say 'Building extensions.' cr quackery ]
           else drop
 
-          shell """
-
-        try:
-            quackery(quackscript)
+          shell """)
         except QuackeryError as diagnostics:
             print('\nQuackery crashed.\n')
             print(diagnostics)

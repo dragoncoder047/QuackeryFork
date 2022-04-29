@@ -573,7 +573,6 @@ def putfile(ctx):
             ctx.to_stack(true)
 
 def releasefile(ctx):
-    nonlocal filepath
     filename = ctx.string_from_stack()
     if len(filepath) > 1:
         ctx.to_stack(filepath[-1])

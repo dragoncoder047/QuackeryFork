@@ -498,9 +498,9 @@ def peek(ctx):
     nest = ctx.from_stack()
     if index >= len(nest) or (
         index < 0 and len(nest) < abs(index)):
-        failed('Cannot peek an item outside a nest.')
+        ctx.failed('Cannot peek an item outside a nest.')
     else:
-        to_stack(nest[index])
+        ctx.to_stack(nest[index])
 
 def poke(ctx):
     ctx.expect_number()
@@ -594,7 +594,7 @@ def sharefile(ctx):
     try:
         with open(filename) as f: filetext = f.read()
     except FileNotFoundError:
-        qsto_stack(false)
+        ctx.to_stack(false)
     except:
         raise
     else:

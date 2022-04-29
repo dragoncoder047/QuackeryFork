@@ -472,7 +472,7 @@ def join(ctx):
     if not isNest(b):
         b = [b]
     ctx.expect_something()
-    a = from_stack()
+    a = ctx.from_stack()
     if not isNest(a):
         a = [a]
     ctx.to_stack(a + b)

@@ -688,7 +688,7 @@ def resolves(ctx):
         if ctx.operators[name][0] != unresolved:
             raise TypeError(name + ' is not a forward reference.')
         ctx.check_build()
-        ctx.operators[name][0] = current_build.pop()
+        ctx.operators[name][0] = ctx.current_build.pop()
     else:
         raise NameError('Unrecognised word: ' + name)
 

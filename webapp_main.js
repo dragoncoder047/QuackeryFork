@@ -45,11 +45,6 @@ window.addEventListener('DOMContentLoaded', async function main() {
         term.pause();
     };
 
-    var old_open = pyodide.globals.get('open');
-    pyodide.globals.set('open', function fetch_opener(filename, mode) {
-        throw 'fixme';
-    });
-
     await pyodide.runPythonAsync(`
         from pyodide.http import pyfetch
         response = await pyfetch("${ORIGIN}/quackery.py")

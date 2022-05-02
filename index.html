@@ -3,14 +3,11 @@
     <head>
         <title>Online Quackery Console</title>
         <base target="_blank">
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.10.5/brython.min.js"></script>
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.10.5/brython_stdlib.js"></script>
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/jcubic/jquery.terminal@2.32.1/js/jquery.terminal-2.32.1.min.js"></script>
         <link rel="stylesheet" type="text/javascript" href="https://cdn.jsdelivr.net/gh/jcubic/jquery.terminal@2.32.1/css/jquery.terminal-2.32.1.min.css">
-        <script type="text/python" src="webapp_main.py"></script>
-        <script type="text/python" src="webapp_worker.py" class="webworker" id="worker"></script>
-        <script type="text/javascript" src="glue.js"></script>
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
+        <script type="text/javascript" src="webapp_main.js"></script>
     </head>
     <body>
         <p>
@@ -21,7 +18,7 @@
             <a href="https://www.rosettacode.org/wiki/Category:Quackery">Quackery on RosettaCode</a>
         </p>
         <div id="terminal">
-        Blah
+        Quackery is loading...
         </div>
     </body>
 </html>

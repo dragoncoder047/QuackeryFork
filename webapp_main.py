@@ -4,7 +4,7 @@ jQuery = window.jQuery
 q_worker = worker.Worker('worker')
 
 def finished_input(text):
-    worker.postMessage(text)
+    worker.send(text)
     term.set_prompt('')
     term.disable()
 

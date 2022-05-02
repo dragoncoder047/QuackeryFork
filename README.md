@@ -1,10 +1,12 @@
 # Quackery
+
 Quackery is a lightweight, open-source language for recreational and 
 educational programming, inspired by Forth and Lisp.
 
 Sample Quackery Shell dialogue; defining and testing an insertion sort.
 
-<pre>/O> [ [] swap witheach
+```qky
+/O> [ [] swap witheach
 ...     [ swap 2dup 
 ...       findwith [ over > ] [ ] 
 ...       nip stuff ] ]           is i-sort ( [ --> [ )
@@ -21,7 +23,7 @@ Stack empty.
 Stack empty.
 
 /O> 
-</pre>
+```
 
 The Quackery language is an extensible assembler for a Quackery
 Engine. The Quackery Engine has a memory model based on dynamic arrays

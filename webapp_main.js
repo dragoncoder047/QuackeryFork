@@ -13,10 +13,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
         greetings: '',
         prompt: '',
         completionEscape: false,
-        pauseEvents: false,
-        completion: function (command, callback) {
-            callback(pyconsole.complete(command).toJs()[0]);
-        },
+        pauseEvents: false
     });
     term.pause();
     window.term = term;
@@ -24,7 +21,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
     globalThis.pyodide = await loadPyodide({
         homedir: '/home/quackery',
         stderr: line => term.error(line),
-        stdout: line => term.echo(line),
+        stdout: line => term.echo(line, { newline: false }),
         stdin: async prompt => {
             term.set_prompt(prompt);
             term.resume();
@@ -53,7 +50,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
 
         from quackery import quackery
         quackery('''
-        say "Welcome to Quackery running on the Pyodide virtual machine."
+        say "Welcome to Quackery running on the Pyodide virtual machine." cr
         shell
         ''')
     `)

@@ -58,6 +58,15 @@ window.addEventListener('DOMContentLoaded', async function main() {
         term.error('https://github.com/dragoncoder047/QuackeryFork/issues');
         term.echo();
         term.exception(e);
+        term.echo('Until this problem is resolved, to run Quackery you can go to');
+        term.echo('https://www.pythonanywhere.com/embedded3/ and paste in this code:')
+        term.echo();
+        term.echo('from requests import get');
+        term.echo('def load(url):');
+        term.echo('    c = compile(get(url).text, url, \'exec\'');
+        term.echo('    exec(c, globals(), globals())');
+        term.echo('load(\'https://raw.githubusercontent.com/GordonCharlton/Quackery/main/quackery.py\')');
+        term.echo();
         term.pause();
     }
 });

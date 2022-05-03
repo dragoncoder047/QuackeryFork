@@ -29,7 +29,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
                 term.resume();
                 term.set_prompt(prompt);
                 var line;
-                while ((line = stdin_queue.splice(1, 1)[0]) === undefined) /*noop*/;
+                while ((line = stdin_queue.splice(1, 1)[0]) === undefined) await sleep(10);
                 term.pause();
                 return line;
             },

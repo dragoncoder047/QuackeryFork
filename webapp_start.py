@@ -15,7 +15,7 @@ for file in files1:
 mkdir('sundry')
 files2 = ['cards.qky', 'demo.qky', 'fsm.qky', 'heapsort.qky']
 for file in files2:
-    await get(f'@@ORIGIN@@/sundry/{file}')
+    await get(f'sundry/{file}')
 
 from quackery import quackery
 

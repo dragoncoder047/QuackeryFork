@@ -9,7 +9,7 @@ function sleep(s) {
 window.addEventListener('DOMContentLoaded', async function main() {
 
     var inputDone;
-    var term = $("#terminal").terminal(inputDone, {
+    var term = $("#terminal").terminal(x => inputDone(x), {
         greetings: '',
         prompt: '',
         completionEscape: false,
@@ -35,23 +35,17 @@ window.addEventListener('DOMContentLoaded', async function main() {
 
     pyodide._api.on_fatal = async (e) => {
         term.error("AAAAH!! You crashed Python! Please report this error:");
-        term.error(e);
+        term.exception(e);
         term.error("Look in the browser console for more details.");
         term.pause();
         await sleep(15);
         term.pause();
     };
 
-    await pyodide.runPythonAsync(`
-        from pyodide.http import pyfetch
-        response = await pyfetch("${ORIGIN}/quackery.py")
-        with open("quackery.py", "wb") as quackeryfile:
-            quackeryfile.write(await response.bytes())
+    var resp = await fetch('webapp_start.py');
+    var py = await resp.text();
 
-        from quackery import quackery
-        quackery('''
-        say "Welcome to Quackery running on the Pyodide virtual machine." cr
-        shell
-        ''')
-    `)
+    await pyodide.runPythonAsync(py);
+
+    term.error('Reload the page to run Quackery again.');
 });

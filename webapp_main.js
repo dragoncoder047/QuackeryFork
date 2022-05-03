@@ -64,7 +64,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
         term.echo();
         term.echo('from requests import get');
         term.echo('def load(url):');
-        term.echo('    c = compile(get(url).text, url, \'exec\'');
+        term.echo('    c = compile(get(url).text, url, \'exec\')');
         term.echo('    exec(c, globals(), globals())');
         term.echo('load(\'https://raw.githubusercontent.com/GordonCharlton/Quackery/main/quackery.py\')');
         term.echo();

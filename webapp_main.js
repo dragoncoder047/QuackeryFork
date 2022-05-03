@@ -50,9 +50,10 @@ window.addEventListener('DOMContentLoaded', async function main() {
     }
     catch (e) {
         term.clear();
-        term.error('An error occurred loading Quackery:')
-        term.exception(e);
+        term.error('A fatal error occurred while loading Quackery.')
         term.error('Please report this error if it continues to occur.');
         term.error('https://github.com/dragoncoder047/QuackeryFork/issues');
+        term.echo();
+        term.exception(e);
     }
 });

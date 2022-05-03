@@ -49,7 +49,6 @@ window.addEventListener('DOMContentLoaded', async function main() {
         term.error('Reload the page to run Quackery again.');
     }
     catch (e) {
-        term.clear();
         term.error('A fatal error occurred while loading Quackery.')
         term.error('Please report this error if it continues to occur.');
         term.error('https://github.com/dragoncoder047/QuackeryFork/issues');

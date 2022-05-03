@@ -5,6 +5,7 @@ from os import mkdir
 async def get(file):
     response = await pyfetch(f"@@ORIGIN@@/{file}")
     with open(file, "wb") as f:
+        print('Loading', file)
         f.write(await response.bytes())
 
 files1 = ['quackery.py', 'bigrat.qky', 'extensions.qky', 'turtleduck.qky']

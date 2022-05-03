@@ -8,8 +8,7 @@ function sleep(s) {
 
 window.addEventListener('DOMContentLoaded', async function main() {
 
-    var inputDone;
-    var term = $("#terminal").terminal(x => inputDone(x), {
+    var term = $("#terminal").terminal(_ => { }, {
         greetings: '',
         prompt: '',
         completionEscape: false,
@@ -23,9 +22,8 @@ window.addEventListener('DOMContentLoaded', async function main() {
         stderr: line => term.error(line),
         stdout: line => term.echo(line, { newline: false }),
         stdin: async prompt => {
-            term.set_prompt(prompt);
             term.resume();
-            var input = await new Promise(resolve => (inputDone = resolve));
+            var input = await term.read(prompt);
             term.pause();
             await sleep(10);
             return input;

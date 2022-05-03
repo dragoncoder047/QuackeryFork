@@ -1,6 +1,6 @@
 // modified from the Pyodide console (https://pyodide.org/en/stable/console.html), since it already uses jQuery.terminal
 
-const ORIGIN = 'https://dragoncoder047.github.io/QuackeryFork/'
+const ORIGIN = 'https://dragoncoder047.github.io/QuackeryFork'
 
 function sleep(s) {
     return new Promise((resolve) => setTimeout(resolve, s));

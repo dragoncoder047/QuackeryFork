@@ -1,3 +1,10 @@
+body {
+    padding: none;
+    margin: none;
+    background: black;
+    color: white; 
+}
+
 header {
     height: 2em;
     vertical-align: middle;
@@ -5,7 +12,7 @@ header {
 }
 
 #terminal {
-    height: calc(100vh - 2em);
+    height: calc(90vh - 2em);
     padding: none;
     margin: none;
 }

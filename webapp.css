@@ -1,0 +1,11 @@
+header {
+    height: 2em;
+    vertical-align: middle;
+    margin: none;
+}
+
+#terminal {
+    height: calc(100vh - 2em);
+    padding: none;
+    margin: none;
+}

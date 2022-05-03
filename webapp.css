@@ -4,6 +4,7 @@ body {
     background: black;
     color: white; 
     font-family: monospace;
+    font-size: 1.5em;
 }
 
 a:visited {
@@ -15,7 +16,7 @@ a {
 }
 
 header {
-    height: 2em;
+    height: 3em;
     vertical-align: middle;
     margin: none;
 }

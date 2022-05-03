@@ -47,7 +47,6 @@ window.addEventListener('DOMContentLoaded', async function main() {
         var resp = await fetch('webapp_start.py');
         var py = await resp.text();
 
-
         await pyodide.runPythonAsync(py.replaceAll('@@ORIGIN@@', ORIGIN));
 
         term.error('Reload the page to run Quackery again.');

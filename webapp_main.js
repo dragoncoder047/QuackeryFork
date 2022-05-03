@@ -25,13 +25,12 @@ window.addEventListener('DOMContentLoaded', async function main() {
             homedir: '/home/quackery',
             stderr: line => term.error(line),
             stdout: line => term.echo(line),
-            stdin: prompt => {
+            stdin: async prompt => {
                 term.resume();
-                term.set_prompt(prompt);
-                var line;
-                while ((line = stdin_queue.splice(1, 1)[0]) === undefined) /*noop*/;
+                var input = await term.read(prompt);
                 term.pause();
-                return line;
+                await sleep(10);
+                return input;
             },
         });
 

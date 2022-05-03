@@ -4,7 +4,6 @@ body {
     background: black;
     color: white;
     font-family: monospace;
-    font-size: 1.5em;
 }
 
 .terminal {
@@ -20,9 +19,10 @@ a {
 }
 
 header {
-    height: 3em;
+    height: 2em;
     vertical-align: middle;
     margin: none;
+    font-size: 1.5em;
 }
 
 #terminal {

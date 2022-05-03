@@ -16,34 +16,41 @@ window.addEventListener('DOMContentLoaded', async function main() {
     });
     term.pause();
     window.term = term;
+    try {
+        globalThis.pyodide = await loadPyodide({
+            homedir: '/home/quackery',
+            stderr: line => term.error(line),
+            stdout: line => term.echo(line, { newline: false }),
+            stdin: async prompt => {
+                term.resume();
+                var input = await term.read(prompt);
+                term.pause();
+                await sleep(10);
+                return input;
+            },
+        });
 
-    globalThis.pyodide = await loadPyodide({
-        homedir: '/home/quackery',
-        stderr: line => term.error(line),
-        stdout: line => term.echo(line, { newline: false }),
-        stdin: async prompt => {
-            term.resume();
-            var input = await term.read(prompt);
+
+        pyodide._api.on_fatal = async (e) => {
+            term.error("AAAAH!! You crashed Python! Please report this error:");
+            term.exception(e);
+            term.error("Look in the browser console for more details.");
             term.pause();
-            await sleep(10);
-            return input;
-        },
-    });
+            await sleep(15);
+            term.pause();
+        };
 
+        var resp = await fetch('webapp_start.py');
+        var py = await resp.text();
 
-    pyodide._api.on_fatal = async (e) => {
-        term.error("AAAAH!! You crashed Python! Please report this error:");
+        await pyodide.runPythonAsync(py);
+
+        term.error('Reload the page to run Quackery again.');
+    }
+    catch (e) {
+        term.error('An error occurred loading Quackery:')
         term.exception(e);
-        term.error("Look in the browser console for more details.");
-        term.pause();
-        await sleep(15);
-        term.pause();
-    };
-
-    var resp = await fetch('webapp_start.py');
-    var py = await resp.text();
-
-    await pyodide.runPythonAsync(py);
-
-    term.error('Reload the page to run Quackery again.');
+        term.error('Please report this error if it continues to occur.');
+        term.error('https://github.com/dragoncoder047/QuackeryFork/issues');
+    }
 });

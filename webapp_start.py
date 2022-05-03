@@ -1,7 +1,9 @@
+# @@ORIGIN@@ will be replaced in Javascript
+
 from pyodide.http import pyfetch
 from os import mkdir
 async def get(file):
-    response = await pyfetch(f"${ORIGIN}/{file}")
+    response = await pyfetch(f"@@ORIGIN@@/{file}")
     with open(file, "wb") as f:
         f.write(await response.bytes())
 
@@ -13,7 +15,7 @@ for file in files1:
 mkdir('sundry')
 files2 = ['cards.qky', 'demo.qky', 'fsm.qky', 'heapsort.qky']
 for file in files2:
-    await get(f'sundry/{file}')
+    await get(f'@@ORIGIN@@/sundry/{file}')
 
 from quackery import quackery
 

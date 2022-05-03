@@ -19,19 +19,23 @@ for file in files2:
     await get(f'sundry/{file}')
 
 from quackery import quackery
+print(r'''
+   ___                   _                      ___        _ _
+  / _ \ _   _  __ _  ___| | _____ _ __ _   _   / _ \ _ __ | (_)_ __   ___
+ | | | | | | |/ _` |/ __| |/ / _ \ '__| | | | | | | | '_ \| | | '_ \ / _ \
+ | |_| | |_| | (_| | (__|   <  __/ |  | |_| | | |_| | | | | | | | | |  __/
+  \__\_\\__,_|\__,_|\___|_|\_\___|_|   \__, |  \___/|_| |_|_|_|_| |_|\___|
+                                       |___/
+      Welcome to Quackery running on the Pyodide virtual machine.
 
+''')
 quackery(r'''
-say "   ___                   _                      ___        _ _" cr
-say "  / _ \ _   _  __ _  ___| | _____ _ __ _   _   / _ \ _ __ | (_)_ __   ___" cr
-say " | | | | | | |/ _` |/ __| |/ / _ \ '__| | | | | | | | '_ \| | | '_ \ / _ \" cr
-say " | |_| | |_| | (_| | (__|   <  __/ |  | |_| | | |_| | | | | | | | | |  __/" cr
-say "  \__\_\\__,_|\__,_|\___|_|\_\___|_|   \__, |  \___/|_| |_|_|_|_| |_|\___|" cr
-say "                                       |___/" cr
-say "Welcome to Quackery running on the Pyodide virtual machine." cr
 
 $ 'extensions.qky' dup name? not
 dip sharefile and iff
     [ cr say 'Building extensions.' cr quackery ]
 else drop
 
-shell''')
+shell
+
+''')

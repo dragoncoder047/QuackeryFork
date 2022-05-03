@@ -3,6 +3,15 @@ body {
     margin: none;
     background: black;
     color: white; 
+    font-family: monospace;
+}
+
+a:visited {
+    color: magenta;
+}
+
+a {
+    color: white;
 }
 
 header {

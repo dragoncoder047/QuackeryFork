@@ -30,6 +30,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
                 term.set_prompt(prompt);
                 var line;
                 while ((line = stdin_queue.splice(1, 1)[0]) === undefined) /*noop*/;
+                term.pause();
                 return line;
             },
         });

@@ -22,7 +22,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
     window.term = term;
     try {
         globalThis.pyodide = await loadPyodide({
-            homedir: '/home/quackery',
+            homedir: '/Pyodide_VFS/quackery',
             stderr: line => term.error(line),
             stdout: line => term.echo(line),
             stdin: async prompt => {
@@ -59,8 +59,8 @@ window.addEventListener('DOMContentLoaded', async function main() {
         term.echo();
         term.exception(e);
         term.echo();
-        term.echo('    Until this problem is resolved, to run Quackery you can go to');
-        term.echo('    https://www.pythonanywhere.com/embedded3/ and paste in this code:')
+        term.echo('Until this problem is resolved, to run Quackery you can go to');
+        term.echo('https://www.pythonanywhere.com/embedded3/ and paste in this code:')
         term.echo();
         term.echo('from requests import get');
         term.echo('def load(url):');

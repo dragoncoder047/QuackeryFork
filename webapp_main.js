@@ -54,5 +54,6 @@ window.addEventListener('DOMContentLoaded', async function main() {
         term.error('https://github.com/dragoncoder047/QuackeryFork/issues');
         term.echo();
         term.exception(e);
+        term.disable();
     }
 });

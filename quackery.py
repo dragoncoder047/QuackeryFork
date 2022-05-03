@@ -538,7 +538,7 @@ def qemit(ctx):
     ctx.expect_number()
     char = ctx.from_stack()
     if char == 13:
-        sys.stdout.write('\n')
+        sys.stdout.write('\r\n')
     elif 31 < char < 127:
         sys.stdout.write(chr(char))
     else:

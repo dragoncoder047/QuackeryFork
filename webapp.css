@@ -2,17 +2,25 @@ body {
     padding: none;
     margin: none;
     background: black;
-    color: white; 
+    color: white;
     font-family: monospace;
     font-size: 1.5em;
 }
 
+.terminal,
+.cmd,
+.terminal .terminal-output div div,
+.cmd .prompt {
+    font-size: 1.5em;
+    line-height: 1.6em;
+}
+
 a:visited {
-    color: magenta;
+    color: white;
 }
 
 a {
-    color: white;
+    color: blue;
 }
 
 header {

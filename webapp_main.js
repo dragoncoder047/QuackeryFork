@@ -20,7 +20,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
         globalThis.pyodide = await loadPyodide({
             homedir: '/home/quackery',
             stderr: line => term.error(line),
-            stdout: line => term.echo(line, { newline: false }),
+            stdout: line => term.echo(line),
             stdin: async prompt => {
                 term.resume();
                 var input = await term.read(prompt);

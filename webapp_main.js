@@ -8,7 +8,11 @@ function sleep(s) {
 
 window.addEventListener('DOMContentLoaded', async function main() {
 
-    var term = $("#terminal").terminal(_ => { }, {
+    var stdin_queue = [];
+    var term = $("#terminal").terminal(input => {
+        var lines = input.split('\n');
+        lines.forEach(line => stdin_queue.push(line));
+    }, {
         greetings: '',
         prompt: '',
         completionEscape: false,
@@ -21,12 +25,12 @@ window.addEventListener('DOMContentLoaded', async function main() {
             homedir: '/home/quackery',
             stderr: line => term.error(line),
             stdout: line => term.echo(line),
-            stdin: async prompt => {
+            stdin: prompt => {
                 term.resume();
-                var input = await term.read(prompt);
-                term.pause();
-                await sleep(10);
-                return input;
+                term.set_prompt(prompt);
+                var line;
+                while ((line = stdin_queue.splice(1, 1)[0]) === undefined) /*noop*/;
+                return line;
             },
         });
 
@@ -54,6 +58,6 @@ window.addEventListener('DOMContentLoaded', async function main() {
         term.error('https://github.com/dragoncoder047/QuackeryFork/issues');
         term.echo();
         term.exception(e);
-        term.disable();
+        term.pause();
     }
 });

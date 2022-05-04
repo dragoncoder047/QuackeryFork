@@ -14,6 +14,7 @@ function blockUntilResolved(promise) {
         sab = Int32Array.from(new SharedArrayBuffer(1));
     } catch (e) {
         supportsSAB = false;
+        throw e;
     }
     var result;
     promise.then(val => {

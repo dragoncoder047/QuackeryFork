@@ -40,7 +40,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
     term.pause();
     window.term = term;
     try {
-        navigator.serviceWorker.register(`${ORIGIN}/webapp_sw.js`, { scope: ORIGIN, });
+        await navigator.serviceWorker.register(`${ORIGIN}/webapp_sw.js`);
         term.echo('Service worker registered');
     } catch (e) {
         term.error('Could not register service worker.');

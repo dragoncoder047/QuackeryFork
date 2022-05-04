@@ -43,6 +43,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
         navigator.serviceWorker.register(`${ORIGIN}/webapp_sw.js`, { scope: ORIGIN, });
     } catch (e) {
         term.error('Could not register service worker.');
+        return;
     }
     try {
         globalThis.pyodide = await loadPyodide({

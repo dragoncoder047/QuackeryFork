@@ -27,7 +27,6 @@ function blockUntilResolved(promise) {
 
 window.addEventListener('DOMContentLoaded', async function main() {
 
-    navigator.serviceWorker.register(`${ORIGIN}/webapp_sw.js`, { scope: ORIGIN, });
 
     var term = $("#terminal").terminal(input => {
         var lines = input.split('\n');
@@ -40,6 +39,11 @@ window.addEventListener('DOMContentLoaded', async function main() {
     });
     term.pause();
     window.term = term;
+    try {
+        navigator.serviceWorker.register(`${ORIGIN}/webapp_sw.js`, { scope: ORIGIN, });
+    } catch (e) {
+        term.error('Could not register service worker.');
+    }
     try {
         globalThis.pyodide = await loadPyodide({
             homedir: '/Pyodide_VFS/quackery',

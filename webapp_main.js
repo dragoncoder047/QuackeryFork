@@ -40,7 +40,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
     term.pause();
     window.term = term;
     try {
-        await navigator.serviceWorker.register(`${ORIGIN}/webapp_sw.js`);
+        await navigator.serviceWorker.register('webapp_sw.js');
         term.echo('Service worker registered');
     } catch (e) {
         term.error('Could not register service worker.');
@@ -78,7 +78,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
         term.error('Reload the page to run Quackery again.');
     }
     catch (e) {
-        if (supportsSAB) {
+        if (supportsSAB && false) {
             term.error('A fatal error occurred while loading Quackery.')
             term.error('Please report this error if it continues to occur.');
             term.error('https://github.com/dragoncoder047/QuackeryFork/issues');

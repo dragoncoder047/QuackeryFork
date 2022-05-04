@@ -41,6 +41,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
     window.term = term;
     try {
         navigator.serviceWorker.register(`${ORIGIN}/webapp_sw.js`, { scope: ORIGIN, });
+        term.echo('Service worker registered');
     } catch (e) {
         term.error('Could not register service worker.');
         term.exception(e);
@@ -48,7 +49,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
     }
     try {
         globalThis.pyodide = await loadPyodide({
-            homedir: '/Pyodide_VFS/quackery',
+            homedir: '/quackery',
             stderr: line => term.error(line),
             stdout: line => term.echo(line),
             stdin: prompt => {

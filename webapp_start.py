@@ -2,21 +2,98 @@
 
 from pyodide.http import pyfetch
 from os import mkdir
-async def get(file):
-    response = await pyfetch(f"@@ORIGIN@@/{file}")
-    with open(file, "wb") as f:
-        print('Loading', file)
-        f.write(await response.bytes())
-
-files1 = ['quackery.py', 'bigrat.qky', 'extensions.qky', 'turtleduck.qky']
-for file in files1:
-    # N. B. top-level await is only allowed in Pyodide
-    await get(file)
+import ast
+import js
 
 mkdir('sundry')
-files2 = ['cards.qky', 'demo.qky', 'fsm.qky', 'heapsort.qky']
-for file in files2:
-    await get(f'sundry/{file}')
+files = ['bigrat', 'extensions', 'turtleduck', 'sundty/cards', 'sundry/demo', 'sundry/fsm', 'sundry/heapsort']
+
+for file in files:
+    # N. B. top-level await is only allowed in Pyodide
+    resp = await pyfetch(f'@@ORIGIN@@/{file}.qky')
+    print(f'Downloading {file}.qky ...')
+    text = await resp.bytes()
+    with open(f'{file}.qky', 'wb') as f: f.write(text)
+
+resp = await pyfetch('@@ORIGIN@@/quackery.py')
+quackerytext = (await resp.bytes()).decode('utf8')
+
+# PATCH - make functions async
+
+def has_await(node):
+    for subnode in ast.walk(node):
+        if isinstance(subnode, ast.Await): return True
+    return False
+
+class FixFirst(ast.NodeTransformer):
+    def visit_Call(self, node):
+        name = node.func.id
+        if name == 'input' or name = 'current_item':
+            print('\tAwaiting function', name)
+            if name == 'input':
+                print('\tRenaming input')
+                node.func.id = 'async_patched_input'
+            return ast.Await(node)
+
+changed = False
+asynced_functions = ['async_patched_input', 'current_item']
+class MakeFunctionAsyncValid(ast.NodeTransformer):
+    def visit_FunctionDef(self, node):
+        name = node.func.id
+        if has_await(node):
+            print('\tFound bad function', name, '> fixing')
+            return ast.AsyncFunctionDef(
+                name=node.name,
+                args=node.args,
+                body=node.body,
+                decorator_list=node.decorator_list
+            )
+            asynced_functions.append(name)
+            changed = True
+        else:
+            return node
+
+class ApplyAwaitsToAsyncedFunctions(ast.NodeTransformer):
+    def visit_Call(self, node):
+        if instanceof(node.func, ast.Attribute):
+            name = node.func.attr
+        else:
+            name = node.func.id
+        if node in asynced_functions:
+            print('\tNow awaiting call of', name)
+            return ast.Await(node)
+        else:
+            return node
+
+tree = ast.parse(quackerytext)
+
+fixed_tree = FixFirst().visit(tree)
+
+a = MakeFunctionAsyncValid()
+b = ApplyAwaitsToAsyncedFunctions()
+
+while True:
+    changed = False
+    fixed_tree = b.visit(a.visit(fixed_tree))
+    if changed is False:
+        break
+
+fixedquackerytext = f'''
+
+import js
+
+async def async_patched_input(prompt):
+    term = js.term
+    term.resume()
+    result = await term.read(prompt)
+    term.pause()
+    return result
+
+{ast.unparse(fixed_tree)}'''
+
+with open('quackery.py', 'w') as f: f.write(fixedquackerytext)
+
+js.term.clear()
 
 from quackery import quackery
 print(r'''
@@ -29,7 +106,7 @@ print(r'''
       Welcome to Quackery running on the Pyodide virtual machine.
 
 ''')
-quackery(r'''
+await quackery(r'''
 
 $ 'extensions.qky' dup name? not
 dip sharefile and iff

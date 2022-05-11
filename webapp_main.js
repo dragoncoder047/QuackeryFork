@@ -6,25 +6,6 @@ function sleep(s) {
     return new Promise((resolve) => setTimeout(resolve, s));
 }
 
-var supportsSAB = true;
-
-function blockUntilResolved(promise) {
-    var sab;
-    try {
-        sab = Int32Array.from(new SharedArrayBuffer(1));
-    } catch (e) {
-        supportsSAB = false;
-        throw e;
-    }
-    var result;
-    promise.then(val => {
-        result = val;
-        Atomics.notify(sab, 0);
-    })
-    Atomics.wait(sab, 0, 0);
-    return result;
-}
-
 window.addEventListener('DOMContentLoaded', async function main() {
 
 
@@ -40,24 +21,11 @@ window.addEventListener('DOMContentLoaded', async function main() {
     term.pause();
     window.term = term;
     try {
-        await navigator.serviceWorker.register('webapp_sw.js');
-        term.echo('Service worker registered');
-    } catch (e) {
-        term.error('Could not register service worker.');
-        term.exception(e);
-        throw e;
-    }
-    try {
         globalThis.pyodide = await loadPyodide({
             homedir: '/quackery',
             stderr: line => term.error(line),
             stdout: line => term.echo(line),
-            stdin: prompt => {
-                term.resume();
-                var input = blockUntilResolved(term.read(prompt));
-                term.pause();
-                return input;
-            },
+            stdin: window.prompt,
         });
 
 

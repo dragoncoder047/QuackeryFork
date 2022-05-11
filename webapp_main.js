@@ -20,11 +20,13 @@ window.addEventListener('DOMContentLoaded', async function main() {
     });
     term.pause();
     window.term = term;
+    term.echo('Quackery (and Python) are loading...');
+    var c = setTimeout(() => term.echo('this may take a while...'), 5000);
     try {
         globalThis.pyodide = await loadPyodide({
             homedir: '/quackery',
-            stderr: line => term.error(line),
-            stdout: line => term.echo(line),
+            stderr: line => { clearTimeout(c); term.error(line) },
+            stdout: line => { clearTimeout(c); term.echo(line) },
             stdin: window.prompt,
         });
 

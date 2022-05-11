@@ -93,7 +93,7 @@ async def async_patched_input(prompt):
 
 with open('quackery.py', 'w') as f: f.write(fixedquackerytext)
 
-js.term.clear()
+#js.term.clear()
 
 from quackery import quackery
 print(r'''

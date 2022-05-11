@@ -18,7 +18,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
     term.pause();
     window.term = term;
     term.echo('Quackery (and Python) are loading...');
-    var c = setTimeout(() => term.echo('this may take a while...'), 10000);
+    var c = setTimeout(() => term.echo('this may take a while...'), 5000);
     try {
         globalThis.pyodide = await loadPyodide({
             homedir: '/quackery',

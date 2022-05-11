@@ -45,6 +45,8 @@ class FixFirst(ast.NodeTransformer):
                 print('\tRenaming input')
                 node.func.id = 'async_patched_input'
             return ast.Await(node)
+        else:
+            return node
 
 changed = False
 asynced_functions = ['async_patched_input', 'current_item']

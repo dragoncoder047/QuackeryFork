@@ -28,7 +28,6 @@ def has_await(node):
     return False
 
 def get_name(node):
-    print(ast.dump(node, indent=2))
     func = node.func
     if isinstance(func, ast.Attribute):
         return func.attr

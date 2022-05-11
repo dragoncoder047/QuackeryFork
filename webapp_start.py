@@ -50,7 +50,7 @@ changed = False
 asynced_functions = ['async_patched_input', 'current_item']
 class MakeFunctionAsyncValid(ast.NodeTransformer):
     def visit_FunctionDef(self, node):
-        name = node.func.id
+        name = node.name
         if has_await(node):
             print('\tFound bad function', name, '> fixing')
             return ast.AsyncFunctionDef(

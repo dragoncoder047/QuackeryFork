@@ -84,7 +84,7 @@ class ApplyAwaitsToAsyncedFunctions(ast.NodeTransformer):
             return node
         if node in asynced_functions:
             print('\tNow awaiting call of', name)
-            return return ast.Await(
+            return ast.Await(
                 value=node,
                 lineno=node.lineno,
                 col_offset=node.col_offset,
@@ -114,6 +114,7 @@ import js
 async def async_patched_input(prompt):
     term = js.term
     term.resume()
+    print('\\u200c', end='') # &zwnj;
     result = await term.read(prompt)
     term.pause()
     return result

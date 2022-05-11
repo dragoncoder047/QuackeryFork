@@ -25,12 +25,20 @@ def has_await(node):
         if isinstance(subnode, ast.Await): return True
     return False
 
+def get_name(node):
+    func = node.func
+    if isinstance(func, ast.Attribute):
+        return func.attr
+    elif isinstance(func, ast.Name):
+        return func.id
+    else:
+        return None
+
 class FixFirst(ast.NodeTransformer):
     def visit_Call(self, node):
-        if isinstance(node.func, ast.Attribute):
-            name = node.func.attr
-        else:
-            name = node.func.id
+        name = get_name(node)
+        if name is None:
+            return node
         if name == 'input' or name == 'current_item':
             print('\tAwaiting function', name)
             if name == 'input':
@@ -58,10 +66,9 @@ class MakeFunctionAsyncValid(ast.NodeTransformer):
 
 class ApplyAwaitsToAsyncedFunctions(ast.NodeTransformer):
     def visit_Call(self, node):
-        if isinstance(node.func, ast.Attribute):
-            name = node.func.attr
-        else:
-            name = node.func.id
+        name = get_name(node)
+        if name is None:
+            return node
         if node in asynced_functions:
             print('\tNow awaiting call of', name)
             return ast.Await(node)

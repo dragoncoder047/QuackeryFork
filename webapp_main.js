@@ -17,6 +17,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
     });
     term.pause();
     window.term = term;
+    await sleep(500);
     term.echo('Quackery (and Python) are loading...');
     var c = setTimeout(() => term.echo('this may take a while...'), 5000);
     try {

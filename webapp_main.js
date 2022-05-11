@@ -9,10 +9,7 @@ function sleep(s) {
 window.addEventListener('DOMContentLoaded', async function main() {
 
 
-    var term = $("#terminal").terminal(input => {
-        var lines = input.split('\n');
-        lines.forEach(line => stdin_queue.push(line));
-    }, {
+    var term = $("#terminal").terminal(() => {}, {
         greetings: '',
         prompt: '',
         completionEscape: false,

@@ -44,7 +44,13 @@ class FixFirst(ast.NodeTransformer):
             if name == 'input':
                 print('\tRenaming input')
                 node.func.id = 'async_patched_input'
-            return ast.Await(node)
+            return ast.Await(
+                value=node,
+                lineno=node.lineno,
+                col_offset=node.col_offset,
+                end_lineno=node.end_lineno,
+                end_col_offset=node.end_col_offset + 6
+            )
         else:
             return node
 
@@ -59,7 +65,11 @@ class MakeFunctionAsyncValid(ast.NodeTransformer):
                 name=node.name,
                 args=node.args,
                 body=node.body,
-                decorator_list=node.decorator_list
+                decorator_list=node.decorator_list,
+                lineno=node.lineno,
+                col_offset=node.col_offset,
+                end_lineno=node.end_lineno,
+                end_col_offset=node.end_col_offset
             )
             asynced_functions.append(name)
             changed = True
@@ -73,7 +83,13 @@ class ApplyAwaitsToAsyncedFunctions(ast.NodeTransformer):
             return node
         if node in asynced_functions:
             print('\tNow awaiting call of', name)
-            return ast.Await(node)
+            return return ast.Await(
+                value=node,
+                lineno=node.lineno,
+                col_offset=node.col_offset,
+                end_lineno=node.end_lineno,
+                end_col_offset=node.end_col_offset + 6
+            )
         else:
             return node
 

@@ -4,6 +4,7 @@ from pyodide.http import pyfetch
 from os import mkdir
 import ast
 import js
+from itertools import count
 
 mkdir('sundry')
 files = ['bigrat', 'extensions', 'turtleduck', 'sundry/cards', 'sundry/demo', 'sundry/fsm', 'sundry/heapsort']
@@ -15,6 +16,7 @@ for file in files:
     text = await resp.string()
     with open(f'{file}.qky', 'w') as f: f.write(text)
 
+print('Downloading quackery.py ...')
 resp = await pyfetch('@@ORIGIN@@/quackery.py')
 quackerytext = await resp.string()
 
@@ -94,19 +96,23 @@ class ApplyAwaitsToAsyncedFunctions(ast.NodeTransformer):
         else:
             return node
 
+print('Parsing...')
 tree = ast.parse(quackerytext)
 
+print('Patching')
 fixed_tree = FixFirst().visit(tree)
 
 a = MakeFunctionAsyncValid()
 b = ApplyAwaitsToAsyncedFunctions()
 
-while True:
+for it in count(1):
+    print('Fixing... iteration', it)
     changed = False
     fixed_tree = b.visit(a.visit(fixed_tree))
     if changed is False:
         break
 
+print('Unparsing...')
 fixedquackerytext = f'''
 
 import js
@@ -121,6 +127,7 @@ async def async_patched_input(prompt):
 
 {ast.unparse(fixed_tree)}'''
 
+print('Loading...')
 with open('quackery.py', 'w') as f: f.write(fixedquackerytext)
 
 #js.term.clear()

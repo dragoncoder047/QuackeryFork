@@ -27,7 +27,10 @@ def has_await(node):
 
 class FixFirst(ast.NodeTransformer):
     def visit_Call(self, node):
-        name = node.func.id
+        if isinstance(node.func, ast.Attribute):
+            name = node.func.attr
+        else:
+            name = node.func.id
         if name == 'input' or name == 'current_item':
             print('\tAwaiting function', name)
             if name == 'input':
@@ -55,7 +58,7 @@ class MakeFunctionAsyncValid(ast.NodeTransformer):
 
 class ApplyAwaitsToAsyncedFunctions(ast.NodeTransformer):
     def visit_Call(self, node):
-        if instanceof(node.func, ast.Attribute):
+        if isinstance(node.func, ast.Attribute):
             name = node.func.attr
         else:
             name = node.func.id

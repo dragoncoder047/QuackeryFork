@@ -28,7 +28,7 @@ def has_await(node):
 class FixFirst(ast.NodeTransformer):
     def visit_Call(self, node):
         name = node.func.id
-        if name == 'input' or name = 'current_item':
+        if name == 'input' or name == 'current_item':
             print('\tAwaiting function', name)
             if name == 'input':
                 print('\tRenaming input')

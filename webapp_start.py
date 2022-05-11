@@ -12,11 +12,11 @@ for file in files:
     # N. B. top-level await is only allowed in Pyodide
     resp = await pyfetch(f'@@ORIGIN@@/{file}.qky')
     print(f'Downloading {file}.qky ...')
-    text = await resp.bytes()
-    with open(f'{file}.qky', 'wb') as f: f.write(text)
+    text = await resp.string()
+    with open(f'{file}.qky', 'w') as f: f.write(text)
 
 resp = await pyfetch('@@ORIGIN@@/quackery.py')
-quackerytext = (await resp.bytes()).decode('utf8')
+quackerytext = await resp.string()
 
 # PATCH - make functions async
 

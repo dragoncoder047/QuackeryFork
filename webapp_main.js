@@ -21,7 +21,7 @@ window.addEventListener('DOMContentLoaded', async function main() {
     term.pause();
     window.term = term;
     term.echo('Quackery (and Python) are loading...');
-    var c = setTimeout(() => term.echo('this may take a while...'), 5000);
+    var c = setTimeout(() => term.echo('this may take a while...'), 10000);
     try {
         globalThis.pyodide = await loadPyodide({
             homedir: '/quackery',
@@ -48,27 +48,20 @@ window.addEventListener('DOMContentLoaded', async function main() {
         term.error('Reload the page to run Quackery again.');
     }
     catch (e) {
-        if (supportsSAB || true) {
-            term.error('A fatal error occurred while loading Quackery.')
-            term.error('Please report this error if it continues to occur.');
-            term.error('https://github.com/dragoncoder047/QuackeryFork/issues');
-            term.echo();
-            term.exception(e);
-            term.echo();
-            term.echo('Until this problem is resolved, to run Quackery you can go to');
-            term.echo('https://www.pythonanywhere.com/embedded3/ and paste in this code:')
-            term.echo();
-            term.echo('from requests import get');
-            term.echo('def load(url):');
-            term.echo('    c = compile(get(url).text, url, \'exec\')');
-            term.echo('    exec(c, globals(), globals())');
-            term.echo('load(\'https://raw.githubusercontent.com/GordonCharlton/Quackery/main/quackery.py\')');
-        }
-        else {
-            term.error('Something went wrong loading Quackery. Please reload the page and try again.')
-            term.error('If the problem persists, it probably means your browser doesn\'t support');
-            term.error('the features needed to run Quackery. Sorry about that.');
-        }
+        term.error('A fatal error occurred while loading Quackery.')
+        term.error('Please report this error if it continues to occur.');
+        term.error('https://github.com/dragoncoder047/QuackeryFork/issues');
+        term.echo();
+        term.exception(e);
+        term.echo();
+        term.echo('Until this problem is resolved, to run Quackery you can go to');
+        term.echo('https://www.pythonanywhere.com/embedded3/ and paste in this code:')
+        term.echo();
+        term.echo('from requests import get');
+        term.echo('def load(url):');
+        term.echo('    c = compile(get(url).text, url, \'exec\')');
+        term.echo('    exec(c, globals(), globals())');
+        term.echo('load(\'https://raw.githubusercontent.com/GordonCharlton/Quackery/main/quackery.py\')');
         term.echo();
         term.pause();
         throw e;

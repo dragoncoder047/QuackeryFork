@@ -110,7 +110,7 @@ await quackery(r'''
 
 $ 'extensions.qky' dup name? not
 dip sharefile and iff
-    [ cr say 'Building extensions.' cr quackery ]
+    [ cr say 'Building extensions...' cr quackery ]
 else drop
 
 shell

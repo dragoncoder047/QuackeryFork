@@ -6,7 +6,7 @@ import ast
 import js
 
 mkdir('sundry')
-files = ['bigrat', 'extensions', 'turtleduck', 'sundty/cards', 'sundry/demo', 'sundry/fsm', 'sundry/heapsort']
+files = ['bigrat', 'extensions', 'turtleduck', 'sundry/cards', 'sundry/demo', 'sundry/fsm', 'sundry/heapsort']
 
 for file in files:
     # N. B. top-level await is only allowed in Pyodide

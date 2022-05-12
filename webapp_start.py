@@ -12,12 +12,13 @@ files = ['bigrat', 'extensions', 'turtleduck', 'sundry/cards', 'sundry/demo', 's
 for file in files:
     # N. B. top-level await is only allowed in Pyodide
     resp = await pyfetch(f'@@ORIGIN@@/{file}.qky')
-    print(f'Downloading {file}.qky ...')
+    print(f'Downloading {file}.qky', flush=True)
     text = await resp.string()
     with open(f'{file}.qky', 'w') as f: f.write(text)
 
-print('Downloading quackery.py ...')
+print('Downloading quackery.py', flush=True)
 resp = await pyfetch('@@ORIGIN@@/quackery.py')
+print('Started download', flush=True)
 quackerytext = await resp.string()
 
 # PATCH - make functions async
@@ -96,23 +97,23 @@ class ApplyAwaitsToAsyncedFunctions(ast.NodeTransformer):
         else:
             return node
 
-print('Parsing...')
+print('Parsing', flush=True)
 tree = ast.parse(quackerytext)
 
-print('Patching')
+print('Patching', flush=True)
 fixed_tree = FixFirst().visit(tree)
 
 a = MakeFunctionAsyncValid()
 b = ApplyAwaitsToAsyncedFunctions()
 
 for it in count(1):
-    print('Fixing... iteration', it)
+    print('Fixing, iteration', it, flush=True)
     changed = False
     fixed_tree = b.visit(a.visit(fixed_tree))
     if changed is False:
         break
 
-print('Unparsing...')
+print('Unparsing', flush=True)
 fixedquackerytext = f'''
 
 import js
@@ -120,14 +121,14 @@ import js
 async def async_patched_input(prompt):
     term = js.term
     term.resume()
-    print('\\u200c', end='') # &zwnj;
+    print('\\u200c', end='', flush=True) # &zwnj;
     result = await term.read(prompt)
     term.pause()
     return result
 
 {ast.unparse(fixed_tree)}'''
 
-print('Loading...')
+print('Loading', flush=True)
 with open('quackery.py', 'w') as f: f.write(fixedquackerytext)
 
 #js.term.clear()

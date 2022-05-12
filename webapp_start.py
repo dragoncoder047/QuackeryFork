@@ -25,7 +25,8 @@ quackerytext = await resp.string()
 
 def has_await(node):
     for subnode in ast.walk(node):
-        if isinstance(subnode, ast.Await): return True
+        if isinstance(subnode, ast.Await):
+            return True
     return False
 
 def get_name(node):
@@ -103,13 +104,10 @@ tree = ast.parse(quackerytext)
 print('Patching', flush=True)
 fixed_tree = FixFirst().visit(tree)
 
-a = MakeFunctionAsyncValid()
-b = ApplyAwaitsToAsyncedFunctions()
-
 for it in count(1):
     print('Fixing, iteration', it, flush=True)
     changed = False
-    fixed_tree = b.visit(a.visit(fixed_tree))
+    fixed_tree = ApplyAwaitsToAsyncedFunctions().visit(MakeFunctionAsyncValid().visit(fixed_tree))
     if changed is False:
         break
 

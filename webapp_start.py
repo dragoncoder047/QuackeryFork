@@ -4,7 +4,7 @@ from pyodide.http import pyfetch
 from os import mkdir
 import re
 import js
-from itertools import count
+from itertools import count, chain
 
 mkdir('sundry')
 files = ['bigrat', 'extensions', 'turtleduck', 'sundry/cards', 'sundry/demo', 'sundry/fsm', 'sundry/heapsort']
@@ -21,111 +21,43 @@ resp = await pyfetch('@@ORIGIN@@/quackery_OOP.py')
 quackerytext = await resp.string()
 
 # PATCH - make functions async
-'''
-def has_await(node):
-    for subnode in ast.walk(node):
-        if isinstance(subnode, ast.Await):
-            return True
-    return False
-
-def get_name(node):
-    func = node.func
-    if isinstance(func, ast.Attribute):
-        return func.attr
-    elif isinstance(func, ast.Name):
-        return func.id
-    else:
-        return None
-
-class FixFirst(ast.NodeTransformer):
-    def visit_Call(self, node):
-        name = get_name(node)
-        if name is None:
-            return node
-        if name == 'input' or name == 'current_item':
-            print('\tAwaiting function', name)
-            if name == 'input':
-                print('\tRenaming input')
-                node.func.id = 'async_patched_input'
-            return ast.Await(
-                value=node,
-                lineno=node.lineno,
-                col_offset=node.col_offset,
-                end_lineno=node.end_lineno,
-                end_col_offset=node.end_col_offset + 6
-            )
-        else:
-            return node
-
-changed = False
-asynced_functions = ['async_patched_input', 'current_item']
-class MakeFunctionAsyncValid(ast.NodeTransformer):
-    def visit_FunctionDef(self, node):
-        global changed, asynced_functions
-        name = node.name
-        if has_await(node):
-            print('\tFound bad function', name, '> fixing')
-            return ast.AsyncFunctionDef(
-                name=node.name,
-                args=node.args,
-                body=node.body,
-                decorator_list=node.decorator_list,
-                lineno=node.lineno,
-                col_offset=node.col_offset,
-                end_lineno=node.end_lineno,
-                end_col_offset=node.end_col_offset
-            )
-            asynced_functions.append(name)
-            changed = True
-        else:
-            return node
-
-class ApplyAwaitsToAsyncedFunctions(ast.NodeTransformer):
-    def visit_Call(self, node):
-        name = get_name(node)
-        if name is None:
-            return node
-        if node in asynced_functions:
-            print('\tNow awaiting call of', name)
-            return ast.Await(
-                value=node,
-                lineno=node.lineno,
-                col_offset=node.col_offset,
-                end_lineno=node.end_lineno,
-                end_col_offset=node.end_col_offset + 6
-            )
-        else:
-            return node
-
-print('Parsing', flush=True)
-tree = ast.parse(quackerytext)
-
-print('Patching', flush=True)
-fixed_tree = FixFirst().visit(tree)
-
-for it in count(1):
-    print('Fixing, iteration', it, flush=True)
-    changed = False
-    fixed_tree = ApplyAwaitsToAsyncedFunctions().visit(MakeFunctionAsyncValid().visit(fixed_tree))
-    if changed is False:
-        break
-
-print('Unparsing', flush=True)
-'''
 
 NO_INDENT_DEF_RE = re.compile(r'(?<!async )def (?P<name>[\w_][\w\d_]*)\(.*\):(?:\n+ {4}.*)+', re.M)
 ONE_INDENT_DEF_RE = re.compile(r' {4}(?<!async )def (?P<name>[\w_][\w\d_]*)\(.*\):(?:\n+ {8}.*)+', re.M)
+CALL_RE = r'(?<!await )(?:ctx\.|self\.)?%s\('
 
-#TODO - patch using RE
+quackerytext = quackerytext.replace('input(', 'await ainput(').replace('current_item(', 'await current_item(')
 
-fixedquackerytext = f'''
+done = False
+async_functions = []
+while not done:
+    done = True
+    for m in chain(NO_INDENT_DEF_RE.finditer(quackerytext), ONE_INDENT_DEF_RE.finditer(quackerytext)):
+        name, body = m.group('name', 0)
+        if 'await' in body:
+            async_functions.append(name)
+            print('Doing asyncing of', name, flush=True)
+            quackerytext = quackerytext.replace(body, 'async ' + body)
+            done = False
+    for name in asynced_functions:
+        quackerytext, change_count = re.subn(CALL_RE % name, quackerytext)
+        if change_count > 0:
+            done = False
+            print('Doing await of', name, flush=True)
+
+for w in ('async', 'await'):
+    while f'{w} {w}' in quackerytext:
+        quackerytext = quackerytext.replace(f'{w} {w}', w)
+
+
+quackerytext = rf'''
 
 import js
 
-async def async_patched_input(prompt):
+async def ainput(prompt):
     term = js.term
     term.resume()
-    print('\\u200c', end='', flush=True) # &zwnj;
+    print('\u200c', end='', flush=True) # &zwnj;
     result = await term.read(prompt)
     term.pause()
     return result
@@ -145,16 +77,11 @@ print(r'''
  | |_| | |_| | (_| | (__|   <  __/ |  | |_| | | |_| | | | | | | | | |  __/
   \__\_\\__,_|\__,_|\___|_|\_\___|_|   \__, |  \___/|_| |_|_|_|_| |_|\___|
                                        |___/
-      Welcome to Quackery running on the Pyodide virtual machine.
-
-''')
-await quackery(r'''
-
-$ 'extensions.qky' dup name? not
-dip sharefile and iff
-    [ cr say 'Building extensions...' cr quackery ]
-else drop
-
-shell
-
-''')
+      Welcome to Quackery running on the Pyodide virtual machine.''')
+await quackery(r'''$ 'extensions.qky' dup name? not
+dip sharefile and iff [
+    cr say 'Building extensions...' cr
+    quackery
+] else
+    drop
+shell''')

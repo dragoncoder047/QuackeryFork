@@ -24,7 +24,7 @@ quackerytext = await resp.string()
 
 NO_INDENT_DEF_RE = re.compile(r'(?<!async )def (?P<name>[\w_][\w\d_]*)\(.*\):(?:\n+ {4}.*)+', re.M)
 ONE_INDENT_DEF_RE = re.compile(r' {4}(?<!async )def (?P<name>[\w_][\w\d_]*)\(.*\):(?:\n+ {8}.*)+', re.M)
-CALL_RE = r'(?<!await )(?:ctx\.|self\.)?%s\('
+CALL_RE = r'(?<!await )((?:ctx\.|self\.)?%s\()'
 
 quackerytext = quackerytext.replace('input(', 'await ainput(').replace('current_item(', 'await current_item(')
 
@@ -40,13 +40,14 @@ while not done:
             quackerytext = quackerytext.replace(body, 'async ' + body)
             done = False
     for name in asynced_functions:
-        quackerytext, change_count = re.subn(CALL_RE % name, quackerytext)
+        quackerytext, change_count = re.subn(CALL_RE % name, r'await \1', quackerytext)
         if change_count > 0:
             done = False
             print('Doing await of', name, flush=True)
 
 for w in ('async', 'await'):
     while f'{w} {w}' in quackerytext:
+        print('Doubled', w, flush=True)
         quackerytext = quackerytext.replace(f'{w} {w}', w)
 
 

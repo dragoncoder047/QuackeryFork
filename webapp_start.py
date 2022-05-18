@@ -34,7 +34,7 @@ quackerytext = quackerytext.replace('input(', 'await ainput(').replace('current_
 asynced_functions = []
 for it in count(1):
     done = True
-    print('Iteration' it)
+    print('Iteration', it)
     for m in chain(NO_INDENT_DEF_RE.finditer(quackerytext), ONE_INDENT_DEF_RE.finditer(quackerytext)):
         name, body = m.group('name', 0)
         if 'await' in body:

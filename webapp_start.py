@@ -29,13 +29,13 @@ CALL_RE = r'(?<!await )(?:ctx\.|self\.)?%s\('
 quackerytext = quackerytext.replace('input(', 'await ainput(').replace('current_item(', 'await current_item(')
 
 done = False
-async_functions = []
+asynced_functions = []
 while not done:
     done = True
     for m in chain(NO_INDENT_DEF_RE.finditer(quackerytext), ONE_INDENT_DEF_RE.finditer(quackerytext)):
         name, body = m.group('name', 0)
         if 'await' in body:
-            async_functions.append(name)
+            asynced_functions.append(name)
             print('Doing asyncing of', name, flush=True)
             quackerytext = quackerytext.replace(body, 'async ' + body)
             done = False

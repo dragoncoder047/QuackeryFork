@@ -2,7 +2,7 @@
 
 from pyodide.http import pyfetch
 from os import mkdir
-import ast
+import re
 import js
 from itertools import count
 
@@ -17,12 +17,11 @@ for file in files:
     with open(f'{file}.qky', 'w') as f: f.write(text)
 
 print('Downloading quackery.py', flush=True)
-resp = await pyfetch('@@ORIGIN@@/quackery.py')
-print('Started download', flush=True)
+resp = await pyfetch('@@ORIGIN@@/quackery_OOP.py')
 quackerytext = await resp.string()
 
 # PATCH - make functions async
-
+'''
 def has_await(node):
     for subnode in ast.walk(node):
         if isinstance(subnode, ast.Await):
@@ -112,6 +111,13 @@ for it in count(1):
         break
 
 print('Unparsing', flush=True)
+'''
+
+NO_INDENT_DEF_RE = re.compile(r'(?<!async )def (?P<name>[\w_][\w\d_]*)\(.*\):(?:\n+ {4}.*)+', re.M)
+ONE_INDENT_DEF_RE = re.compile(r' {4}(?<!async )def (?P<name>[\w_][\w\d_]*)\(.*\):(?:\n+ {8}.*)+', re.M)
+
+#TODO - patch using RE
+
 fixedquackerytext = f'''
 
 import js
@@ -124,7 +130,7 @@ async def async_patched_input(prompt):
     term.pause()
     return result
 
-{ast.unparse(fixed_tree)}'''
+{quackerytext}'''
 
 print('Loading', flush=True)
 with open('quackery.py', 'w') as f: f.write(fixedquackerytext)

@@ -19,72 +19,12 @@ for file in files:
     text = await resp.string()
     with open(f'{file}.qky', 'w') as f: f.write(text)
 
-print('Downloading quackery_OOP.py')
-resp = await pyfetch('@@ORIGIN@@/quackery_OOP.py')
+print('Downloading quackery_OOP_ASYNC.py')
+resp = await pyfetch('@@ORIGIN@@/quackery_OOP_ASYNC.py')
 quackerytext = await resp.string()
-
-# PATCH - make functions async
-
-NO_INDENT_DEF_RE = re.compile(r'(?<!async )def (?P<name>(?!__)[\w_][\w\d_]*)\(.*\):(?:\n+ {4}.*)+', re.M)
-ONE_INDENT_DEF_RE = re.compile(r' {4}(?<!async )def (?P<name>(?!__)[\w_][\w\d_]*)\(.*\):(?:\n+ {8}.*)+', re.M)
-CALL_RE = r'(?<!await )(?<!def )(?<!\.)((?:ctx\.|self\.)?%s\()'
-
-quackerytext = quackerytext.replace('input(', 'await ainput(').replace('current_item(', 'await current_item(')
-
-asynced_functions = []
-for it in count(1):
-    done = True
-    print('Iteration', it)
-    for m in chain(NO_INDENT_DEF_RE.finditer(quackerytext), ONE_INDENT_DEF_RE.finditer(quackerytext)):
-        name, body = m.group('name', 0)
-        if 'await' in body:
-            asynced_functions.append(name)
-            print('Doing asyncing of', name)
-            quackerytext = quackerytext.replace(body, 'async ' + body)
-            done = False
-            while 'async  ' in quackerytext:
-                quackerytext = quackerytext.replace('async  ', 'async ')
-    for name in asynced_functions:
-        quackerytext, change_count = re.subn(CALL_RE % name, r'await \1', quackerytext)
-        if change_count > 0:
-            done = False
-            print('Doing await of', name)
-            while 'await  ' in quackerytext:
-                quackerytext = quackerytext.replace('await  ', 'await ')
-    await delay(100)
-    if done:
-        break
-
-for w in ('async', 'await'):
-    while f'{w} {w}' in quackerytext:
-        print('XX>>', w)
-        delay(100)
-        quackerytext = quackerytext.replace(f'{w} {w}', w)
-
-
-quackerytext = rf'''
-
-import js
-
-async def ainput(prompt):
-    term = js.term
-    term.resume()
-    print('\u200c', end='') # &zwnj;
-    result = await term.read(prompt)
-    term.pause()
-    return result
-
-{quackerytext}'''
-
-print('Loading')
 with open('quackery.py', 'w') as f: f.write(quackerytext)
 
-js.term.echo(
-    f'<span style="color: green">{quackerytext}</span>',
-    {'raw': True}
-)
-
-#js.term.clear()
+js.term.clear()
 
 from quackery import quackery
 print(r'''

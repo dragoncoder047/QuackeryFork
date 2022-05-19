@@ -25,9 +25,9 @@ quackerytext = await resp.string()
 
 # PATCH - make functions async
 
-NO_INDENT_DEF_RE = re.compile(r'(?<!async\s+)def (?P<name>(?!__)[\w_][\w\d_]*)\(.*\):(?:\n+ {4}.*)+', re.M)
-ONE_INDENT_DEF_RE = re.compile(r' {4}(?<!async\s+)def (?P<name>(?!__)[\w_][\w\d_]*)\(.*\):(?:\n+ {8}.*)+', re.M)
-CALL_RE = r'(?<!await\s+)(?<!\.)(?<!def\s+)((?:ctx\.|self\.)?%s\()'
+NO_INDENT_DEF_RE = re.compile(r'(?<!async )def (?P<name>(?!__)[\w_][\w\d_]*)\(.*\):(?:\n+ {4}.*)+', re.M)
+ONE_INDENT_DEF_RE = re.compile(r' {4}(?<!async )def (?P<name>(?!__)[\w_][\w\d_]*)\(.*\):(?:\n+ {8}.*)+', re.M)
+CALL_RE = r'(?<!await )(?<!def )(?<!\.)((?:ctx\.|self\.)?%s\()'
 
 quackerytext = quackerytext.replace('input(', 'await ainput(').replace('current_item(', 'await current_item(')
 
@@ -42,11 +42,15 @@ for it in count(1):
             print('Doing asyncing of', name)
             quackerytext = quackerytext.replace(body, 'async ' + body)
             done = False
+            while 'async  ' in quackerytext:
+                quackerytext = quackerytext.replace('async  ', 'async ')
     for name in asynced_functions:
         quackerytext, change_count = re.subn(CALL_RE % name, r'await \1', quackerytext)
         if change_count > 0:
             done = False
             print('Doing await of', name)
+            while 'await  ' in quackerytext:
+                quackerytext = quackerytext.replace('await  ', 'await ')
     await delay(100)
     if done:
         break

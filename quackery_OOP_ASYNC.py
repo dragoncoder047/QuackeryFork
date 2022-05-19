@@ -16,8 +16,10 @@ async def ainput(prompt):
     return result
 
 async def maybe_await(item):
-    if isinstance(item, Future):
+    try:
         await item
+    except TypeError:
+        pass
 
 def isNest(item):
     return isinstance(item, list)

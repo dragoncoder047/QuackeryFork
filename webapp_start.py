@@ -25,9 +25,9 @@ quackerytext = await resp.string()
 
 # PATCH - make functions async
 
-NO_INDENT_DEF_RE = re.compile(r'(?<!async )def (?P<name>(?!__)[\w_][\w\d_]*)\(.*\):(?:\n+ {4}.*)+', re.M)
-ONE_INDENT_DEF_RE = re.compile(r' {4}(?<!async )def (?P<name>(?!__)[\w_][\w\d_]*)\(.*\):(?:\n+ {8}.*)+', re.M)
-CALL_RE = r'(?<!await )(?<!\.)(?<!def )((?:ctx\.|self\.)?%s\()'
+NO_INDENT_DEF_RE = re.compile(r'(?<!async\s+)def (?P<name>(?!__)[\w_][\w\d_]*)\(.*\):(?:\n+ {4}.*)+', re.M)
+ONE_INDENT_DEF_RE = re.compile(r' {4}(?<!async\s+)def (?P<name>(?!__)[\w_][\w\d_]*)\(.*\):(?:\n+ {8}.*)+', re.M)
+CALL_RE = r'(?<!await\s+)(?<!\.)(?<!def\s+)((?:ctx\.|self\.)?%s\()'
 
 quackerytext = quackerytext.replace('input(', 'await ainput(').replace('current_item(', 'await current_item(')
 
@@ -74,6 +74,11 @@ async def ainput(prompt):
 
 print('Loading')
 with open('quackery.py', 'w') as f: f.write(quackerytext)
+
+js.term.echo(
+    f'<span style="color: green">{quackerytext}</span>',
+    {'raw': True}
+)
 
 #js.term.clear()
 

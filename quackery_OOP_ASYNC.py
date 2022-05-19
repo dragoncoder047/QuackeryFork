@@ -218,7 +218,7 @@ class QuackeryContext:
                     return the_nest
                 elif word in self.builders.keys():
                     try:
-                        await self.builders[word](self)
+                        await (self.builders[word](self))
                     except TypeError:
                         pass
                 elif word in self.operators.keys():

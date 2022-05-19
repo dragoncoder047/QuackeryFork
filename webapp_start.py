@@ -19,7 +19,7 @@ for file in files:
     text = await resp.string()
     with open(f'{file}.qky', 'w') as f: f.write(text)
 
-print('Downloading quackery.py')
+print('Downloading quackery_OOP.py')
 resp = await pyfetch('@@ORIGIN@@/quackery_OOP.py')
 quackerytext = await resp.string()
 
@@ -27,7 +27,7 @@ quackerytext = await resp.string()
 
 NO_INDENT_DEF_RE = re.compile(r'(?<!async )def (?P<name>(?!__)[\w_][\w\d_]*)\(.*\):(?:\n+ {4}.*)+', re.M)
 ONE_INDENT_DEF_RE = re.compile(r' {4}(?<!async )def (?P<name>(?!__)[\w_][\w\d_]*)\(.*\):(?:\n+ {8}.*)+', re.M)
-CALL_RE = r'(?<!await )((?:ctx\.|self\.)?%s\()'
+CALL_RE = r'(?<!await )(?<!\.)((?:ctx\.|self\.)?%s\()'
 
 quackerytext = quackerytext.replace('input(', 'await ainput(').replace('current_item(', 'await current_item(')
 
@@ -47,7 +47,7 @@ for it in count(1):
         if change_count > 0:
             done = False
             print('Doing await of', name)
-    delay(100)
+    await delay(100)
     if done:
         break
 

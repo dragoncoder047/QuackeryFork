@@ -15,12 +15,6 @@ async def ainput(prompt):
     term.pause()
     return result
 
-async def maybe_await(item):
-    try:
-        await item
-    except TypeError:
-        pass
-
 def isNest(item):
     return isinstance(item, list)
 
@@ -142,7 +136,10 @@ class QuackeryContext:
             self.current_nest = current_item
             self.program_counter = 0
         elif isOperator(current_item):
-            await maybe_await(current_item(self))
+            try:
+                await current_item(self)
+            except TypeError:
+                pass
             self.program_counter += 1
         elif isNumber(current_item):
             self.to_stack(current_item)
@@ -220,7 +217,10 @@ class QuackeryContext:
                         raise SyntaxError('Unexpected end of nest.')
                     return the_nest
                 elif word in self.builders.keys():
-                    await maybe_await(self.builders[word](self))
+                    try:
+                        await self.builders[word](self)
+                    except TypeError:
+                        pass
                 elif word in self.operators.keys():
                     the_nest.append(self.operators[word])
                 elif isinteger(word):

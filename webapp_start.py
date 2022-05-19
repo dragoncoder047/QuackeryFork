@@ -27,7 +27,7 @@ quackerytext = await resp.string()
 
 NO_INDENT_DEF_RE = re.compile(r'(?<!async )def (?P<name>(?!__)[\w_][\w\d_]*)\(.*\):(?:\n+ {4}.*)+', re.M)
 ONE_INDENT_DEF_RE = re.compile(r' {4}(?<!async )def (?P<name>(?!__)[\w_][\w\d_]*)\(.*\):(?:\n+ {8}.*)+', re.M)
-CALL_RE = r'(?<!await )(?<!\.)((?:ctx\.|self\.)?%s\()'
+CALL_RE = r'(?<!await )(?<!\.)(?<!def )((?:ctx\.|self\.)?%s\()'
 
 quackerytext = quackerytext.replace('input(', 'await ainput(').replace('current_item(', 'await current_item(')
 

@@ -334,7 +334,7 @@ async def multiply(ctx):
 
 async def qdivmod(ctx):
     await ctx.expect_number()
-    a = await tx.from_stack()
+    a = await ctx.from_stack()
     if a == 0:
         await ctx.failed('Division by zero.')
     await ctx.expect_number()

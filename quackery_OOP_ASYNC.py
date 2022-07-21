@@ -687,7 +687,7 @@ async def unresolved(ctx):
 async def forward(ctx):
     ctx.current_build.append([unresolved])
 
-async async def resolves(ctx):
+async def resolves(ctx):
     name = ctx.get_name()
     if name in ctx.operators:
         if ctx.operators[name][0] != unresolved:

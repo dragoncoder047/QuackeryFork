@@ -257,10 +257,10 @@ async def python(ctx):
 async def qfail(ctx):
     await ctx.failed(await ctx.string_from_stack())
 
-def stack_size(ctx):
+async def stack_size(ctx):
     ctx.to_stack(len(ctx.qstack))
 
-def qreturn(ctx):
+async def qreturn(ctx):
     ctx.to_stack(ctx.rstack)
 
 async def dup(ctx):
@@ -289,7 +289,7 @@ async def over(ctx):
     ctx.to_stack(a)
     await swap(ctx)
 
-def nest_depth(ctx):
+async def nest_depth(ctx):
     ctx.to_stack(len(ctx.rstack) // 2)
 
 true = 1
@@ -388,7 +388,7 @@ async def bitwise_not(ctx):
     await ctx.expect_number()
     ctx.to_stack(~await ctx.from_stack())
 
-def qtime(ctx):
+async def qtime(ctx):
     ctx.to_stack(int(time.time()*1000000))
 
 async def meta_done(ctx):
@@ -452,7 +452,7 @@ async def qput(ctx):
     b = await ctx.from_stack()
     a.append(b)
 
-def immovable(ctx):
+async def immovable(ctx):
     pass
 
 async def take(ctx):
@@ -465,7 +465,7 @@ async def take(ctx):
             await ctx.failed('Cannot remove an immovable item.')
     await ctx.to_stack(a.pop())
 
-def create_nest(ctx):
+async def create_nest(ctx):
     ctx.to_stack([])
 
 async def qsplit(ctx):
@@ -547,7 +547,7 @@ async def qemit(ctx):
     else:
         sys.stdout.write('\uFFFD')
 
-def ding(ctx):
+async def ding(ctx):
     sys.stdout.write('\a')
 
 async def qinput(ctx):
@@ -671,23 +671,23 @@ async def qis(ctx):
     name = ctx.get_name()
     ctx.operators[name] = ctx.current_build.pop()
 
-def qcomment(ctx):
+async def qcomment(ctx):
     word = ''
     while word != ')':
         word = ctx.next_word()
         if word == '':
             raise EOFError('Unclosed comment.')
 
-def endcomment(ctx):
+async def endcomment(ctx):
     raise SyntaxError('Too many end of comments.')
 
-def unresolved(ctx):
+async def unresolved(ctx):
     raise TypeError('Unresolved forward reference.')
 
-def forward(ctx):
+async def forward(ctx):
     ctx.current_build.append([unresolved])
 
-async def resolves(ctx):
+async async def resolves(ctx):
     name = ctx.get_name()
     if name in ctx.operators:
         if ctx.operators[name][0] != unresolved:
@@ -697,13 +697,13 @@ async def resolves(ctx):
     else:
         raise NameError('Unrecognised word: ' + name)
 
-def char_literal(ctx):
+async def char_literal(ctx):
     char = ctx.one_char()
     if char == '':
         raise SyntaxError('No character found.')
     ctx.current_build.append(ord(char))
 
-def string_literal(ctx):
+async def string_literal(ctx):
     delimiter = ''
     result = []
     while delimiter == '':
@@ -721,7 +721,7 @@ def string_literal(ctx):
             result.append(ord(char))
     ctx.current_build.append([[meta_literal], result])
 
-def hexnum(ctx):
+async def hexnum(ctx):
     word = ctx.get_name()
     if not ishex(word):
         raise SyntaxError(word + " is not hexadecimal.")

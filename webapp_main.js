@@ -13,7 +13,10 @@ window.addEventListener('DOMContentLoaded', async function main() {
         greetings: '',
         prompt: '',
         completionEscape: false,
-        pauseEvents: false
+        pauseEvents: false,
+        exit: false,
+        scrollOnEcho: true,
+        mousewheel: () => true
     });
     term.pause();
     window.term = term;

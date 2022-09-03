@@ -209,9 +209,9 @@ class QuackeryContext:
                     if nesting < 0:
                         raise SyntaxError('Unexpected end of nest.')
                     return the_nest
-                elif word in self.builders.keys():
+                elif word in self.builders:
                     self.builders[word](self)
-                elif word in self.operators.keys():
+                elif word in self.operators:
                     the_nest.append(self.operators[word])
                 elif isinteger(word):
                     the_nest.append(int(word, 10))
@@ -1646,7 +1646,7 @@ def quackery(source_string, ctx = None):
         ctx = QuackeryContext()
     else:
         for required_word in ('stacksize', 'pack', 'decimal', 'unbuild', 'quackery'):
-            if required_word not in ctx.operators.keys():
+            if required_word not in ctx.operators:
                 raise NameError('QuackeryContext must have word %s defined.' % required_word)
 
     while True:

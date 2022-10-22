@@ -18,7 +18,7 @@ for file in files:
     resp = await pyfetch(f'@@ORIGIN@@/{file}.qky')
     text = await resp.string()
     with open(f'{file}.qky', 'w') as f: f.write(text)
-    delay(10)
+    await delay(100)
     print('done')
 
 print('Downloading quackery_OOP.py... ', end='')
@@ -45,7 +45,7 @@ print('done')
 quackery(r'''$ 'extensions.qky' dup name? not dip sharefile and iff [ say 'Compiling extensions... ' cr quackery say 'done' cr ] else drop''', qc)
 
 print('Starting...')
-delay(1000)
+await delay(1000)
 js.term.clear()
 
 print(r'''

@@ -58,6 +58,6 @@ async def shell_loop():
             prompt = '... '
             if not i:
                 break
-        ctx.to_stack([ord(char) for char in input])
-        quackery('quackery 5 nesting put cr echostack nesting release')
+        qc.to_stack([ord(char) for char in input])
+        quackery('quackery 5 nesting put cr echostack nesting release', qc)
 await shell_loop()

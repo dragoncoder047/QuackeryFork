@@ -2,9 +2,7 @@
 
 from pyodide.http import pyfetch
 from os import mkdir
-import re
 import js
-from itertools import count, chain
 
 async def delay(time):
     await js.Promise.new(lambda resolve, reject: js.setTimeout(resolve, time))
@@ -18,7 +16,7 @@ for file in files:
     resp = await pyfetch(f'@@ORIGIN@@/{file}.qky')
     text = await resp.string()
     with open(f'{file}.qky', 'w') as f: f.write(text)
-    await delay(100)
+    await delay(300)
     print('done')
 
 print('Downloading quackery_OOP.py... ', end='')
@@ -38,7 +36,7 @@ async def ainput(prompt):
     return result
 
 print('Compiling builtins... ', end='')
-from quackery import *
+from quackery import quackery, QuackeryContext
 qc = QuackeryContext()
 print('done')
 

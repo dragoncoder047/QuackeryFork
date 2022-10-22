@@ -67,5 +67,5 @@ async def shell_loop():
             if not i:
                 break
         qc.to_stack([ord(char) for char in input])
-        quackery('quackery 5 nesting put cr echostack nesting release', qc)
+        quackery('0 backup [ quackery ] bailed not iff [ 5 nesting put cr echostack nesting release ] else [ message take echo$ ]', qc)
 await shell_loop()

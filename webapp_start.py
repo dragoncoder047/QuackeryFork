@@ -13,29 +13,41 @@ mkdir('sundry')
 files = ['bigrat', 'extensions', 'turtleduck', 'sundry/cards', 'sundry/demo', 'sundry/fsm', 'sundry/heapsort']
 
 for file in files:
+    print(f'Downloading {file}.qky... ', end='')
     # N. B. top-level await is only allowed in Pyodide
     resp = await pyfetch(f'@@ORIGIN@@/{file}.qky')
-    print(f'Downloading {file}.qky')
     text = await resp.string()
     with open(f'{file}.qky', 'w') as f: f.write(text)
+    delay(10)
+    print('done')
 
-print('Downloading quackery_OOP_ASYNC.py')
+print('Downloading quackery_OOP.py... ', end='')
 resp = await pyfetch('@@ORIGIN@@/quackery_OOP.py')
 quackerytext = await resp.string()
 with open('quackery.py', 'w') as f: f.write(quackerytext)
-
-js.term.clear()
+print('done')
 
 async def ainput(prompt):
     term = js.term
     term.resume()
     print('\u200c', end='') # &zwnj;
-    result = await term.read(prompt)
+    promise = term.read(prompt)
+    term.history().enable()
+    result = await promise
     term.pause()
     return result
 
-from quackery import quackery, QuackeryContext
+print('Compiling builtins... ', end='')
+from quackery import *
 qc = QuackeryContext()
+print('done')
+
+quackery(r'''$ 'extensions.qky' dup name? not dip sharefile and iff [ say 'Compiling extensions... ' cr quackery say 'done' cr ] else drop''', qc)
+
+print('Starting...')
+delay(1000)
+js.term.clear()
+
 print(r'''
    ___                   _                      ___        _ _
   / _ \ _   _  __ _  ___| | _____ _ __ _   _   / _ \ _ __ | (_)_ __   ___
@@ -45,8 +57,6 @@ print(r'''
                                        |___/
       Welcome to Quackery running on the Pyodide virtual machine.
       Don't type 'leave' or you'll break something.''')
-
-quackery(r'''$ 'extensions.qky' dup name? not dip sharefile and iff [ cr say 'Building extensions...' cr quackery ] else drop''', qc)
 
 async def shell_loop():
     while True:

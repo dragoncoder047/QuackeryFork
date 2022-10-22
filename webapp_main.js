@@ -26,8 +26,8 @@ window.addEventListener('DOMContentLoaded', async function main() {
     try {
         globalThis.pyodide = await loadPyodide({
             homedir: '/quackery',
-            stderr: line => { clearTimeout(c); term.error(line) },
-            stdout: line => { clearTimeout(c); term.echo(line) },
+            stderr: line => { clearTimeout(c); requestAnimationFrame(() => term.error(line)); },
+            stdout: line => { clearTimeout(c); requestAnimationFrame(() => term.echo(line)); },
             stdin: window.prompt,
         });
 

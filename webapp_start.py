@@ -20,13 +20,22 @@ for file in files:
     with open(f'{file}.qky', 'w') as f: f.write(text)
 
 print('Downloading quackery_OOP_ASYNC.py')
-resp = await pyfetch('@@ORIGIN@@/quackery_OOP_ASYNC.py')
+resp = await pyfetch('@@ORIGIN@@/quackery_OOP.py')
 quackerytext = await resp.string()
 with open('quackery.py', 'w') as f: f.write(quackerytext)
 
 js.term.clear()
 
-from quackery import quackery
+async def ainput(prompt):
+    term = js.term
+    term.resume()
+    print('\u200c', end='') # &zwnj;
+    result = await term.read(prompt)
+    term.pause()
+    return result
+
+from quackery import quackery, QuackeryContext
+qc = QuackeryContext()
 print(r'''
    ___                   _                      ___        _ _
   / _ \ _   _  __ _  ___| | _____ _ __ _   _   / _ \ _ __ | (_)_ __   ___
@@ -34,11 +43,21 @@ print(r'''
  | |_| | |_| | (_| | (__|   <  __/ |  | |_| | | |_| | | | | | | | | |  __/
   \__\_\\__,_|\__,_|\___|_|\_\___|_|   \__, |  \___/|_| |_|_|_|_| |_|\___|
                                        |___/
-      Welcome to Quackery running on the Pyodide virtual machine.''')
-await quackery(r'''$ 'extensions.qky' dup name? not
-dip sharefile and iff [
-    cr say 'Building extensions...' cr
-    quackery
-] else
-    drop
-shell''')
+      Welcome to Quackery running on the Pyodide virtual machine.
+      Don't type 'leave' or you'll break something.''')
+
+quackery(r'''$ 'extensions.qky' dup name? not dip sharefile and iff [ cr say 'Building extensions...' cr quackery ] else drop''', qc)
+
+async def shell_loop():
+    while True:
+        prompt = '/O> '
+        input = ''
+        while True:
+            i = await ainput(prompt)
+            input += i + '\n'
+            prompt = '... '
+            if not i:
+                break
+        ctx.to_stack([ord(char) for char in input])
+        quackery('quackery 5 nesting put cr echostack nesting release')
+await shell_loop()

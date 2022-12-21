@@ -112,7 +112,7 @@ class QuackeryContext:
         return self.rstack.pop()
 
     def failed(self, message):
-        self.traverse(self.build("stacksize pack decimal unbuild base release return$ nestdepth ]bailby["))
+        self.traverse(self.build("stacksize pack decimal unbuild ' base size 2 > if [ base release ] return$ nestdepth ]bailby["))
         returnstack = self.string_from_stack()
         thestack = self.string_from_stack()
         raise QuackeryError('\n       Problem: ' + message +
